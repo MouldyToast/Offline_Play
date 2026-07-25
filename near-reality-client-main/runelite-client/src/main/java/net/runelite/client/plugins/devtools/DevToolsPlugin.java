@@ -72,7 +72,7 @@ import org.slf4j.LoggerFactory;
 	name = "Developer Tools",
 	tags = {"panel"},
 	developerPlugin = true,
-		enabledByDefault = false
+		enabledByDefault = true
 )
 @Getter
 public class DevToolsPlugin extends Plugin
