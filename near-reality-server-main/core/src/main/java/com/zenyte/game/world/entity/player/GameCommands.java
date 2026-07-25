@@ -241,29 +241,6 @@ public final class GameCommands {
             p.getHpHud().open(NpcId.NEX, 1500);
         });
 
-        new Command(PlayerPrivilege.ADMINISTRATOR, "findobj", (p, args) -> {
-            int objId = Integer.parseInt(args[0]);
-            ObjectArrayList<Integer> found = new ObjectArrayList<>();
-            for (int id = 0; id < MapBuilder.AMOUNT_OF_REGIONS; id++) {
-                Region region = World.regions.get(id);
-                if (region == null) {
-                    region = new Region(id);
-                    World.regions.put(id, region);
-                }
-                region.load();
-
-                final int regionId = id;
-                if(region.getObjects() != null)
-                    region.getObjects().forEach((o, o1) -> {
-                        if (o1.getId() == objId) {
-                            if(!found.contains(regionId))
-                                found.add(regionId);
-                        }
-                    });
-            }
-            found.forEach(i -> System.out.println("FOUND: "+i));
-        });
-
         new Command(PlayerPrivilege.ADMINISTRATOR, "hphudclose", (p, args) -> {
             p.getHpHud().close();
         });
@@ -2304,17 +2281,31 @@ public final class GameCommands {
                 name += args[i] + (i == args.length - 1 ? "" : " ");
             }
             final ArrayList<String> entries = new ArrayList<>();
+            final ArrayList<Integer> ids = new ArrayList<>();
             for (int i = 0; i < ObjectDefinitions.definitions.length; i++) {
                 final ObjectDefinitions defs = ObjectDefinitions.get(i);
-                if (defs == null) {
-                    continue;
-                }
+                if (defs == null) continue;
                 if (defs.getName().toLowerCase().contains(name)) {
-                    entries.add(defs.getId() + " - " + defs.getName() + ", types: " + (defs.getTypes() == null ? "[10" +
-                            "]" : ArrayUtils.toString(defs.getTypes())));
+                    ids.add(defs.getId());
+                    entries.add(defs.getId() + " - " + defs.getName());
+                    if (entries.size() >= 100) break;
                 }
             }
-            Diary.sendJournal(p, "Query: " + name, entries);
+            if (entries.isEmpty()) {
+                p.sendMessage("No objects found matching '" + name + "'.");
+                return;
+            }
+            p.getDialogueManager().start(new OptionsMenuD(p, "Click to spawn object (" + entries.size() + ")",
+                    entries.toArray(new String[0])) {
+                @Override
+                public void handleClick(int slotId) {
+                    World.spawnObject(new WorldObject(ids.get(slotId), 10, 0, new Location(p.getLocation())));
+                    p.sendMessage("Spawned object " + ids.get(slotId) + " (" + entries.get(slotId) + ")");
+                    p.getDialogueManager().start(this);
+                }
+                @Override
+                public boolean cancelOption() { return true; }
+            });
         });
         new Command(PlayerPrivilege.ADMINISTRATOR, "npcn", "Displays a list of npcs that meet the requested name " +
                 "criteria. " +
@@ -2324,13 +2315,30 @@ public final class GameCommands {
                 name.append(args[i]).append(i == args.length - 1 ? "" : " ");
             }
             final ArrayList<String> entries = new ArrayList<>();
+            final ArrayList<Integer> ids = new ArrayList<>();
             for (final NPCDefinitions defs : NPCDefinitions.getDefinitions()) {
                 if (defs == null) continue;
                 if (defs.getName().toLowerCase().contains(name.toString())) {
+                    ids.add(defs.getId());
                     entries.add(defs.getId() + " - " + defs.getName() + " (lvl-" + defs.getCombatLevel() + ")");
+                    if (entries.size() >= 100) break;
                 }
             }
-            Diary.sendJournal(p, "Query: " + name, entries);
+            if (entries.isEmpty()) {
+                p.sendMessage("No NPCs found matching '" + name + "'.");
+                return;
+            }
+            p.getDialogueManager().start(new OptionsMenuD(p, "Click to spawn NPC (" + entries.size() + ")",
+                    entries.toArray(new String[0])) {
+                @Override
+                public void handleClick(int slotId) {
+                    World.spawnNPC(ids.get(slotId), new Location(p.getLocation())).setSpawned(true);
+                    p.sendMessage("Spawned NPC " + ids.get(slotId) + " (" + entries.get(slotId) + ")");
+                    p.getDialogueManager().start(this);
+                }
+                @Override
+                public boolean cancelOption() { return true; }
+            });
         });
         new Command(PlayerPrivilege.SUPPORT, "players", "Displays a list of players online and their coordinates/area" +
                 ".", (p
