@@ -29,8 +29,8 @@ import java.util.stream.Collectors;
 @PluginDescriptor(
 		name = "Unethical Dev Tools",
 		description = "Shows entity information",
-		enabledByDefault = false,
-		developerPlugin = true, hidden = true
+		enabledByDefault = true,
+		developerPlugin = true, hidden = false
 )
 @Slf4j
 public class UnethicalDevToolsPlugin extends Plugin
