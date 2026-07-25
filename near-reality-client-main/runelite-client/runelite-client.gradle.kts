@@ -181,9 +181,6 @@ tasks {
     }
 
     shadowJar {
-        exclude("net/runelite/client/plugins/devtools/**", "net/runelite/client/plugins/unethicaldevtools/**")
-
-
         manifest {
             attributes(mutableMapOf("Main-Class" to "net.runelite.client.RuneLite"))
         }
