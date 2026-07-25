@@ -3474,8 +3474,8 @@ public abstract class RSClientMixin implements RSClient
 	public static boolean loadWorlds() {
 		client.setWorldCount(3);
 		client.setWorldList(new RSWorld[client.getWorldCount()]);
-		createWorld(1, 1750, "NR - Main Server", "play.near-reality.com");
-		createWorld(2, 20, "NR - Beta Server", "play-beta.near-reality.com");
+		createWorld(1, 1750, "NR - Main Server", "localhost");
+		createWorld(2, 20, "NR - Beta Server", "localhost");
 		createWorld(3, 10, "NR - Dev Server", "localhost");
 		rl$logger.debug("Manually loaded world count {}", client.getWorldCount());
 		client.sortWorldList(1, true, 3, true);
