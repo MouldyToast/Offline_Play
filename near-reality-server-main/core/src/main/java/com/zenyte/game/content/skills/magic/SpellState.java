@@ -42,7 +42,7 @@ public final class SpellState {
 	private static final int[] CHAOS_RUNES = new int[] {11712};
 	private static final int[] DEATH_RUNES = new int[] {11713};
 	private static final int[] BLOOD_RUNES = new int[] {11714};
-	private static final int[] IBANS_STAVES = new int[] {1409, 12658};
+	private static final int[] IBANS_STAVES = new int[] {1409, 12658, 33330, 33332}; // +ornament (o) variants
 	private static final int[] SLAYER_STAVES = new int[] {12902, 21255, 12904, 22296, 4170, 11791, ItemId.STAFF_OF_BALANCE};
 	private static final int[] SARADOMIN_STAVES = new int[] {2415, 22296};
 	private static final int[] GUTHIX_STAVES = new int[] {2416, 8841, ItemId.STAFF_OF_BALANCE};
