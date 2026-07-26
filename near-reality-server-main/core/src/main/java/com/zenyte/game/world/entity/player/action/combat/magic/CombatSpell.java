@@ -798,7 +798,12 @@ public enum CombatSpell implements EntitySpell {
             new Projectile(2337, 31, 31, 51, 23, -5, 64, 10)
     ),
 
-            //::multigfx 290, its 292
+    // Eye of Ayak: 2nd strongest powered staff, 3-tick speed, base max 25
+    // Uses SOUL_REND gfx as placeholder — replace with real normal-attack gfx if found.
+    EYE_OF_AYAK(null, 25, 0, new Animation(1167),
+            new Graphics(3364, 0, 92), new Graphics(3365, -1, 60),
+            new SoundEffect(178, 0, 0), new SoundEffect(1460, 10, -1),
+            new Projectile(2337, 23, 15, 51, 23, 25, 64, 5)),
 
     ;
 	
