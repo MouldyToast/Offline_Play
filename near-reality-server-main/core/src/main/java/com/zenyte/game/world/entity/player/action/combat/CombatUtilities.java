@@ -268,7 +268,8 @@ public class CombatUtilities {
         final String weaponName = player.getEquipment().getName(EquipmentSlot.WEAPON).toLowerCase();
         if (weaponName.contains("trident of the swamp")) return true;
         if (weaponName.contains("toxic blowpipe")) return true;
-        if (weaponName.contains("toxic staff of the dead")) return true;
+        if (weaponName.contains("blazing blowpipe")) return true; // 28688
+        if (weaponName.contains("toxic staff")) return true; // catches "toxic staff of the dead" + "toxic staff (deadman)"
         return false;
     }
 
@@ -276,7 +277,7 @@ public class CombatUtilities {
         final Item weapon = player.getEquipment().getItem(EquipmentSlot.WEAPON);
         if (weapon == null) return false;
         final String weaponName = weapon.getDefinitions().getName();
-        if (weaponName.equalsIgnoreCase("toxic staff of the dead")) return true;
+        if (weaponName.toLowerCase().contains("toxic staff")) return true; // catches deadman variant
         if (weaponName.equalsIgnoreCase("trident of the swamp") && weapon.hasCharges()) return true;
         return false;
     }
@@ -482,7 +483,8 @@ public class CombatUtilities {
                 || itemId == ItemId.PURPLE_TWISTED_BOW
                 || itemId == ItemId.BLUE_TWISTED_BOW
                 || itemId == ItemId.WHITE_TWISTED_BOW
-                || itemId == ItemId.RED_TWISTED_BOW;
+                || itemId == ItemId.RED_TWISTED_BOW
+                || itemId == ItemId.CORRUPTED_TWISTED_BOW; // 28540
     }
 
     public static boolean isElysianSpiritShield(int itemId) {
