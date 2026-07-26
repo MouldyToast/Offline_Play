@@ -374,6 +374,9 @@ public enum AmmunitionDefinitions implements AmmunitionDefinition {
     STARTER_ARROW(22333, false, new Graphics(1525, 0, 96), new SoundEffect(2693, 0, 0),
             new Projectile(1524, 40, 36, 41, 21, 5, 11, 5), 22333),
 
+    TONALZTICS(new int[] { 28919, 28922 }, false, null, new SoundEffect(2693, 0, 0),
+            new Projectile(2727, 30, 20, 40, 15, 10, 64, 5), 28919, 28922),
+
 
     ENCHANTED_OPAL_BOLT(new int[] { 9236 }, true, new SoundEffect(2695, 0, 0),
             new Projectile(27, 38, 36, 41, 7, 5, 11, 5),
