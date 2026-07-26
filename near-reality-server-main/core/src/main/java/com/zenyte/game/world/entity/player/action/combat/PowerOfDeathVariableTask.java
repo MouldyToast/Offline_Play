@@ -16,7 +16,8 @@ public enum PowerOfDeathVariableTask implements VariableTask {
 
     public static final int[] POWER_OF_DEATH_ITEMS = {
             ItemId.STAFF_OF_THE_DEAD, ItemId.TOXIC_STAFF_OF_THE_DEAD,
-            ItemId.TOXIC_STAFF_UNCHARGED, ItemId.STAFF_OF_LIGHT, ItemId.STAFF_OF_BALANCE
+            ItemId.TOXIC_STAFF_UNCHARGED, ItemId.STAFF_OF_LIGHT, ItemId.STAFF_OF_BALANCE,
+            ItemId.STAFF_OF_THE_DEAD_23613, 33035, 33036
     };
 
     @Override
