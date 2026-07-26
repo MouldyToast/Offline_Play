@@ -179,7 +179,7 @@ public class AutocastInterface extends Interface {
                 .add(NORMAL_AUTOCASTABLE_SPELLS)
                 .add(IBAN_BLAST)
                 .build(),
-                (player, name) -> onSpellbook(player, Spellbook.NORMAL) && (name.equals("Iban's staff") || name.equals("Iban's staff (u)"))),
+                (player, name) -> onSpellbook(player, Spellbook.NORMAL) && (name.equals("Iban's staff") || name.equals("Iban's staff (u)") || name.equals("Iban's staff (o)") || name.equals("Iban's staff (u) (o)"))),
         SLAYERS_STAFF(4170, new EnumBuilder<CombatSpell>()
                 .add(NORMAL_AUTOCASTABLE_SPELLS)
                 .add(CRUMBLE_UNDEAD, MAGIC_DART)
