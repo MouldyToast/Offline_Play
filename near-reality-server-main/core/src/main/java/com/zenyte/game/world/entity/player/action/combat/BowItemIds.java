@@ -19,6 +19,7 @@ public final class BowItemIds {
             ItemId.BOW_OF_FAERDHINEN_C_25892,
             ItemId.BOW_OF_FAERDHINEN_C_25894,
             ItemId.BOW_OF_FAERDHINEN_C_25896,
+            ItemId.BOW_OF_FAERDHINEN_C_33021, // deadman variant
             GodBow.Armadyl.INSTANCE.getItemId(),
             GodBow.Bandos.INSTANCE.getItemId(),
             GodBow.Saradomin.INSTANCE.getItemId(),
