@@ -88,6 +88,7 @@ include(
     ":plugins:item:equip",
     ":plugins:item:lootkey",
     ":plugins:item:staff-of-balance",
+    ":plugins:item:rev239-equipment",
     ":plugins:item",
     ":plugins:larranskey",
     ":plugins:npc:definitions",
