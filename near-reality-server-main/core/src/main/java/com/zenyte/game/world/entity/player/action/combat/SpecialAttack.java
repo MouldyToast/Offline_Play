@@ -1310,9 +1310,20 @@ public enum SpecialAttack implements ISpecialAttack {
         final Projectile proj = new Projectile(2727, 30, 20, 40, 15, 10, 64, 5);
         final int delay = World.sendProjectile(player, target, proj);
         target.setGraphics(new Graphics(2731, delay, 0));
-        final Hit hit = combat.getHit(player, target, 1, 1, 1, false);
-        if (hit.getDamage() > 0 && target instanceof Player p) {
-            p.getSkills().drainPercentageStatically(SkillConstants.DEFENCE, 0.10);
+        // +50% accuracy per wiki
+        final Hit hit = combat.getHit(player, target, 1.5, 1, 1, false);
+        if (hit.getDamage() > 0) {
+            if (target instanceof Player p) {
+                // Players: drain 10% defence
+                p.getSkills().drainPercentageStatically(SkillConstants.DEFENCE, 0.10);
+            } else if (target instanceof NPC npc) {
+                // NPCs: drain defence by 12.5% of target's magic level
+                final int magicLevel = npc.getMagicLevel();
+                final int drain = (int) (magicLevel * 0.125);
+                if (drain > 0) {
+                    npc.drainSkill(SkillConstants.DEFENCE, drain);
+                }
+            }
         }
         combat.delayHit(proj.getTime(player.getLocation(), target.getLocation()), hit);
         if (combat instanceof RangedCombat ranged) {
@@ -1423,16 +1434,25 @@ public enum SpecialAttack implements ISpecialAttack {
     // --- Group F: Unique Mechanics ---
 
     BEHEAD(AttackType.SLASH, new int[]{28338, 33335}, WEAPON_SPEED, MELEE, new Animation(10173), new Graphics(2430), (player, combat, target) -> {
-        final Hit hit = combat.getHit(player, target, 1, 1, 1, false);
+        // Consume all soul stacks for boosted damage
+        final int stacks = player.getNumericTemporaryAttribute("soulreaper_stacks").intValue();
+        player.addTemporaryAttribute("soulreaper_stacks", 0);
+        // Per stack: +12% accuracy, +6% max hit, min hit floor of 6% per stack
+        final double accBoost = 1.0 + (stacks * 0.12);
+        final double dmgBoost = 1.0 + (stacks * 0.06);
+        final Hit hit = combat.getHit(player, target, accBoost, dmgBoost, 1, false);
+        // Apply min hit floor: 6% of max per stack
+        if (stacks > 0 && hit.getDamage() > 0) {
+            final int maxHit = combat.getMaxHit(player, dmgBoost, 1, false);
+            final int minHit = (int) (maxHit * stacks * 0.06);
+            if (hit.getDamage() < minHit) {
+                hit.setDamage(minHit);
+            }
+        }
         combat.delayHit(0, hit);
-        if (hit.getDamage() > 0) {
-            // Soulreaper stacking: each spec adds a stack (max 5), +6% max hit per stack, costs 8 HP
-            int stacks = player.getNumericTemporaryAttribute("soulreaper_stacks").intValue();
-            stacks = Math.min(stacks + 1, 5);
-            player.addTemporaryAttribute("soulreaper_stacks", stacks);
-            player.applyHit(new Hit(8, HitType.REGULAR));
-            // Heal 1/4 of damage dealt
-            player.heal(hit.getDamage() / 4);
+        // Heal 8 HP per stack consumed
+        if (stacks > 0) {
+            player.heal(stacks * 8);
         }
     }),
 
