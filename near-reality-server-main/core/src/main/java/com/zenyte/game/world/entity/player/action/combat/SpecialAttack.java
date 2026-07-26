@@ -87,7 +87,7 @@ public enum SpecialAttack implements ISpecialAttack {
         }
     }),
 
-    DESCENT_OF_DARKNESS(AttackType.RANGED, new int[]{11235, 12765, 12766, 12767, 12768, 20408, DARK_BOW_BH}, 8, RANGED, new Animation(426), new Graphics(1112, 0, 95), (player, combat, target) -> {
+    DESCENT_OF_DARKNESS(AttackType.RANGED, new int[]{11235, 12765, 12766, 12767, 12768, 20408, DARK_BOW_BH, 29599, 29611}, 8, RANGED, new Animation(426), new Graphics(1112, 0, 95), (player, combat, target) -> {
         final int ammo = player.getEquipment().getId(EquipmentSlot.AMMUNITION.getSlot());
         final int bow = player.getEquipment().getId(EquipmentSlot.WEAPON.getSlot());
         final boolean dragons = ammo == 11212 || ammo == 11227 || ammo == 11228 || ammo == 11229 || ammo == 11237;
@@ -126,7 +126,7 @@ public enum SpecialAttack implements ISpecialAttack {
         combat.delayHit(secondDelay, new Hit(player, secondHit, HitType.RANGED));
     }),
 
-    DUALITY(AttackType.RANGED, new int[]{22804, 22806, 22808, 22810, 22812, 22814}, WEAPON_SPEED, RANGED, null, null, (player, combat, target) -> {
+    DUALITY(AttackType.RANGED, new int[]{22804, 22806, 22808, 22810, 22812, 22814, ItemId.DRAGON_KNIFE_27157}, WEAPON_SPEED, RANGED, null, null, (player, combat, target) -> {
         final int weapon = player.getWeapon().getId();
         final boolean poisonous = weapon == 22806 || weapon == 22808 || weapon == 22810;
         player.setAnimation(poisonous ? DUALITY_POISONOUS_ANIM : DUALITY_REGULAR_ANIM);
@@ -212,7 +212,7 @@ public enum SpecialAttack implements ISpecialAttack {
         combat.delayHit(SNAPSHOT_SECOND_PROJ.getTime(player.getLocation(), target.getLocation()), combat.getHit(player, target, 0.8, 1, 1, false), combat.getHit(player, target, 0.8, 1, 1, false));
     }),
 
-    THE_JUDGEMENT(AttackType.SLASH, new int[] {ItemId.ARMADYL_GODSWORD, 20593, 20368}, WEAPON_SPEED, MELEE, null, new Graphics(1211), (player, combat, target) -> {
+    THE_JUDGEMENT(AttackType.SLASH, new int[] {ItemId.ARMADYL_GODSWORD, 20593, 20368, ItemId.CORRUPTED_ARMADYL_GODSWORD, 29605}, WEAPON_SPEED, MELEE, null, new Graphics(1211), (player, combat, target) -> {
         final int weaponId = player.getWeapon() == null ? -1 : player.getWeapon().getId();
         player.setAnimation(weaponId == 20368 ? ORNAMENT_JUDGEMENT_ANIM : JUDGEMENT_ANIM);
         combat.delayHit(0, combat.getHit(player, target, 2.15F, 1.1F, 1.25F, false));
@@ -277,7 +277,7 @@ public enum SpecialAttack implements ISpecialAttack {
         combat.delayHit(0, hit);
     }),
 
-    EVISCERATE(AttackType.SLASH, new int[] {ItemId.OSMUMTENS_FANG, ItemId.OSMUMTENS_FANG_OR}, WEAPON_SPEED, MELEE, EVISCERATE_ANIM, EVISCERATE_GFX, (player, combat, target) -> {
+    EVISCERATE(AttackType.SLASH, new int[] {ItemId.OSMUMTENS_FANG, ItemId.OSMUMTENS_FANG_OR, 33174}, WEAPON_SPEED, MELEE, EVISCERATE_ANIM, EVISCERATE_GFX, (player, combat, target) -> {
         World.sendSoundEffect(player, OSMUMTEN_FANG_SOUND);
         combat.delayHit(0, combat.getHit(player, target, 1.50F, 1.0F, 1.00F, false));
         if(player.getBoonManager().hasBoon(SliceNDice.class) && SliceNDice.roll()) {
@@ -287,7 +287,7 @@ public enum SpecialAttack implements ISpecialAttack {
         }
     }),
 
-    SLICE_AND_DICE(AttackType.SLASH, new int[]{DRAGON_CLAWS, DRAGON_CLAWS_20784, DRAGON_CLAWS_OR, DRAGON_CLAWS_CR }, WEAPON_SPEED, MELEE, new Animation(7514, 10), new Graphics(1171, 10, 0), (player, combat, target) -> {
+    SLICE_AND_DICE(AttackType.SLASH, new int[]{DRAGON_CLAWS, DRAGON_CLAWS_20784, DRAGON_CLAWS_OR, DRAGON_CLAWS_CR, ItemId.CORRUPTED_DRAGON_CLAWS }, WEAPON_SPEED, MELEE, new Animation(7514, 10), new Graphics(1171, 10, 0), (player, combat, target) -> {
         int probability = -1;
         for (int i = 0; i < 4; i++) {
             if (!combat.isSuccessful(player, target, 1, AttackType.SLASH)) continue;
@@ -457,7 +457,7 @@ public enum SpecialAttack implements ISpecialAttack {
         });
     }),
 
-    ARMADYL_EYE(AttackType.RANGED, 11785, 5, RANGED, new Animation(4230), null, (player, combat, target) -> {
+    ARMADYL_EYE(AttackType.RANGED, new int[]{11785, ItemId.ARMADYL_CROSSBOW_23611}, 5, RANGED, new Animation(4230), null, (player, combat, target) -> {
         World.sendProjectile(player, target, ARMADYL_EYE_PROJ);
         player.sendSound(ARMADYL_EYE_SOUND);
         combat.delayHit(ARMADYL_EYE_PROJ.getTime(player.getLocation(), target.getLocation()), combat.getHit(player, target, 2, 1, 1, false));
@@ -579,7 +579,7 @@ public enum SpecialAttack implements ISpecialAttack {
         }
     }),
 
-    ROCK_KNOCKER(AttackType.SLASH, new int[]{11920, 12797, 13243, 20014, 13244, CrystalTool.Pickaxe.INSTANCE.getProductItemId(), CrystalTool.Pickaxe.INSTANCE.getInactiveId()}, 0, MELEE, null, null, (player, combat, target) -> {
+    ROCK_KNOCKER(AttackType.SLASH, new int[]{11920, 12797, 13243, 20014, 13244, CrystalTool.Pickaxe.INSTANCE.getProductItemId(), CrystalTool.Pickaxe.INSTANCE.getInactiveId(), ItemId.DRAGON_PICKAXE_OR, ItemId.TRAILBLAZER_PICKAXE}, 0, MELEE, null, null, (player, combat, target) -> {
         final int weaponId = player.getWeapon() == null ? -1 : player.getWeapon().getId();
         if (weaponId == 11920 || weaponId == 12797 || weaponId == 20014) {
             player.setAnimation(ROCK_KNOCKER_ANIM);
@@ -596,7 +596,7 @@ public enum SpecialAttack implements ISpecialAttack {
         player.getSkills().setLevel(SkillConstants.MINING, level + 3);
     }),
 
-    LUMBER_UP(AttackType.SLASH, new int[]{6739, 13241, 20011, 13242, CrystalTool.Axe.INSTANCE.getProductItemId(), CrystalTool.Axe.INSTANCE.getInactiveId()}, 0, MELEE, new Animation(2876), null, (player, combat, target) -> {
+    LUMBER_UP(AttackType.SLASH, new int[]{6739, 13241, 20011, 13242, CrystalTool.Axe.INSTANCE.getProductItemId(), CrystalTool.Axe.INSTANCE.getInactiveId(), ItemId.TRAILBLAZER_AXE, ItemId.DRAGON_FELLING_AXE, ItemId.CRYSTAL_FELLING_AXE, ItemId.CRYSTAL_FELLING_AXE_INACTIVE, ItemId._3RD_AGE_FELLING_AXE}, 0, MELEE, new Animation(2876), null, (player, combat, target) -> {
         final int weaponId = player.getWeapon() == null ? -1 : player.getWeapon().getId();
         player.setGraphics(new Graphics(CrystalTool.Axe.INSTANCE.is(weaponId) ? 1688 : 479));
         player.setForceTalk(LUMBER_UP_FORCETALK);
@@ -608,7 +608,7 @@ public enum SpecialAttack implements ISpecialAttack {
         player.getSkills().setLevel(SkillConstants.WOODCUTTING, level + 3);
     }),
 
-    FISHSTABBER(AttackType.STAB, new int[]{21028, 21031, 21033, CrystalTool.Harpoon.INSTANCE.getProductItemId(), CrystalTool.Harpoon.INSTANCE.getInactiveId()}, 0, MELEE, null, null, (player, combat, target) -> {
+    FISHSTABBER(AttackType.STAB, new int[]{21028, 21031, 21033, CrystalTool.Harpoon.INSTANCE.getProductItemId(), CrystalTool.Harpoon.INSTANCE.getInactiveId(), ItemId.TRAILBLAZER_HARPOON}, 0, MELEE, null, null, (player, combat, target) -> {
         final int weaponId = player.getWeapon() == null ? -1 : player.getWeapon().getId();
         if (weaponId == 21028) {
             player.setAnimation(FISHSTABBER_DRAGON_ANIM);
@@ -759,7 +759,7 @@ public enum SpecialAttack implements ISpecialAttack {
         }, 0, 0);
     }),
 
-    WEAKEN(AttackType.STAB, new int[]{6746, 19675}, WEAPON_SPEED, MELEE, new Animation(2890), new Graphics(483), (player, combat, target) -> {
+    WEAKEN(AttackType.STAB, new int[]{6746, 19675, 30305}, WEAPON_SPEED, MELEE, new Animation(2890), new Graphics(483), (player, combat, target) -> {
         combat.delayHit(0, combat.getHit(player, target, 1, 1, 1, false));
         player.sendSound(WEAKEN_SOUND);
         final boolean demon = target.getEntityType() == EntityType.NPC && Demon.isDemon((NPC) target, false);
@@ -873,7 +873,7 @@ public enum SpecialAttack implements ISpecialAttack {
         }
     }),
 
-    SHIELD_BASH(AttackType.CRUSH, 21015, WEAPON_SPEED, MELEE, new Animation(7511), new Graphics(1336, 0, 30), (player, combat, target) -> {
+    SHIELD_BASH(AttackType.CRUSH, new int[]{21015, ItemId.DINHS_BLAZING_BULWARK}, WEAPON_SPEED, MELEE, new Animation(7511), new Graphics(1336, 0, 30), (player, combat, target) -> {
         final List<Entity> possibleTargets = player.getPossibleTargets(EntityType.BOTH);
         possibleTargets.remove(target);
         combat.delayHit(0, combat.getHit(player, target, 1.2, 1, 1, false));
@@ -929,7 +929,7 @@ public enum SpecialAttack implements ISpecialAttack {
         target.drainSkill(SkillConstants.MAGIC, damage);
     }),
 
-    TOXIC_SIPHON(AttackType.RANGED, 12926, 3, RANGED, new Animation(5061), null, (player, combat, target) -> {
+    TOXIC_SIPHON(AttackType.RANGED, new int[]{12926, ItemId.BLAZING_BLOWPIPE}, 3, RANGED, new Animation(5061), null, (player, combat, target) -> {
         World.sendProjectile(player, target, TOXIC_SIPHON_PROJ);
         final Hit hit = combat.getHit(player, target, 1, 1.5, 1, false);
         final int delay = TOXIC_SIPHON_PROJ.getTime(player.getLocation(), target.getLocation());
@@ -943,7 +943,7 @@ public enum SpecialAttack implements ISpecialAttack {
         }
     }),
 
-    CONCENTRATED_SHOT(AttackType.RANGED, new int[]{ItemId.LIGHT_BALLISTA, ItemId.HEAVY_BALLISTA, ItemId.HEAVY_BALLISTA_OR}, 6, RANGED, new Animation(7222), null, (player, combat, target) -> {
+    CONCENTRATED_SHOT(AttackType.RANGED, new int[]{ItemId.LIGHT_BALLISTA, ItemId.HEAVY_BALLISTA, ItemId.HEAVY_BALLISTA_OR, ItemId.HEAVY_BALLISTA_23630, ItemId.LIGHT_BALLISTA_27188}, 6, RANGED, new Animation(7222), null, (player, combat, target) -> {
         if (player.getAmmo() == null) {
             return;
         }
@@ -1010,7 +1010,7 @@ public enum SpecialAttack implements ISpecialAttack {
         }
     }),
 
-    FEINT(AttackType.STAB, new int[] { VESTAS_LONGSWORD, VESTAS_LONGSWORD_BH }, WEAPON_SPEED, MELEE, new Animation(246), null, (player, combat, target) -> {
+    FEINT(AttackType.STAB, new int[] { VESTAS_LONGSWORD, VESTAS_LONGSWORD_BH, ItemId.VESTAS_LONGSWORD_23615, ItemId.VESTAS_BLIGHTED_LONGSWORD }, WEAPON_SPEED, MELEE, new Animation(246), null, (player, combat, target) -> {
         //Accuracy modifier set to 4x as target's defence is reduced by 75%, which is an identical comparison.
         final Hit hit = combat.getHit(player, target, 4, 1, 1, false);
         if (hit.getDamage() > 0) {
@@ -1020,7 +1020,7 @@ public enum SpecialAttack implements ISpecialAttack {
         combat.delayHit(target, 0, hit);
     }),
 
-    SWH_SMASH(AttackType.CRUSH, new int[] { STATIUSS_WARHAMMER, STATIUSS_WARHAMMER_BH }, WEAPON_SPEED, MELEE, new Animation(1378), new Graphics(844), (player, combat, target) -> {
+    SWH_SMASH(AttackType.CRUSH, new int[] { STATIUSS_WARHAMMER, STATIUSS_WARHAMMER_BH, ItemId.STATIUSS_WARHAMMER_23620 }, WEAPON_SPEED, MELEE, new Animation(1378), new Graphics(844), (player, combat, target) -> {
         final Hit hit = combat.getHit(player, target, 1, 1, 1, false);
         if (hit.getDamage() > 0) {
             hit.setDamage(((int) (combat.getMaxHit(player, 1, 1, false) * 0.2F)) + hit.getDamage());
@@ -1050,7 +1050,7 @@ public enum SpecialAttack implements ISpecialAttack {
         }, delay);
     }),
 
-    PHANTOM_STRIKE(AttackType.RANGED, new int[] { MORRIGANS_JAVELIN, MORRIGANS_JAVELIN_BH }, 4, RANGED, new Animation(806), new Graphics(1621, 0, 90), (player, combat, target) -> {
+    PHANTOM_STRIKE(AttackType.RANGED, new int[] { MORRIGANS_JAVELIN, MORRIGANS_JAVELIN_BH, ItemId.MORRIGANS_JAVELIN_23619 }, 4, RANGED, new Animation(806), new Graphics(1621, 0, 90), (player, combat, target) -> {
         final int delay = World.sendProjectile(player, target, PHANTOM_STRIKE_PROJ);
         final Hit hit = combat.getHit(player, target, 1, 1, 1, false);
         if (combat instanceof RangedCombat ranged) {
@@ -1080,7 +1080,7 @@ public enum SpecialAttack implements ISpecialAttack {
         }, delay);
     }),
 
-    ANNIHILATE(AttackType.RANGED, new int[] { DRAGON_CROSSBOW, DRAGON_CROSSBOW_CR }, 5, RANGED, new Animation(4230), null, (player, combat, target) -> {
+    ANNIHILATE(AttackType.RANGED, new int[] { DRAGON_CROSSBOW, DRAGON_CROSSBOW_CR, 33460 }, 5, RANGED, new Animation(4230), null, (player, combat, target) -> {
         World.sendProjectile(player, target, ANNIHILATE_PROJ);
         final int delay = SNIPE_PROJ.getTime(player.getLocation(), target.getMiddleLocation());
         WorldTasksManager.schedule(() -> target.setGraphics(ANNIHILATE_GFX), delay);
@@ -1134,7 +1134,7 @@ public enum SpecialAttack implements ISpecialAttack {
         }
     }),
 
-    BLOOD_SACRIFICE(AttackType.SLASH, new int[]{ItemId.ANCIENT_GODSWORD}, WEAPON_SPEED, MELEE, null, new Graphics(1996), (player, combat, target) -> {
+    BLOOD_SACRIFICE(AttackType.SLASH, new int[]{ItemId.ANCIENT_GODSWORD, ItemId.ANCIENT_GODSWORD_27184}, WEAPON_SPEED, MELEE, null, new Graphics(1996), (player, combat, target) -> {
         player.setAnimation(new Animation(9171));
         Hit hit = combat.getHit(player, target, 2, 1.1F, 1, false);
         combat.delayHit(0, hit);
@@ -1164,7 +1164,7 @@ public enum SpecialAttack implements ISpecialAttack {
         }
     }),
 
-  ZARYTE_CROSSBOW(AttackType.RANGED, new int[] { ItemId.ZARYTE_CROSSBOW }, -2, RANGED, null, null, (player, combat, target) -> {
+  ZARYTE_CROSSBOW(AttackType.RANGED, new int[] { ItemId.ZARYTE_CROSSBOW, ItemId.ZARYTE_CROSSBOW_27186 }, -2, RANGED, null, null, (player, combat, target) -> {
     player.addTemporaryAttribute("zaryte_cbow_spec", 1);
     // NOTE: Zaryte Crossbow Special Effect is handled on the ranged combat logic
   }),
@@ -1185,7 +1185,7 @@ public enum SpecialAttack implements ISpecialAttack {
         final int amt = player.getPrayerManager().getPrayerPoints();
         player.getPrayerManager().setPrayerPoints(Math.min(120, amt + amount));
     }),
-    IMMOLATE(AttackType.MAGIC, ItemId.VOLATILE_NIGHTMARE_STAFF, WEAPON_SPEED, MELEE, new Animation(8532), new Graphics(1760), (player, combat, target) -> {
+    IMMOLATE(AttackType.MAGIC, new int[]{ItemId.VOLATILE_NIGHTMARE_STAFF, ItemId.VOLATILE_NIGHTMARE_STAFF_25517, 29602, 29609}, WEAPON_SPEED, MELEE, new Animation(8532), new Graphics(1760), (player, combat, target) -> {
         player.cancelCombat();
         target.setGraphics(IMMOLATE_GFX);
         final int max = (int) (Utils.interpolate(50, 66, 75, 99, Math.min(player.getSkills().getLevel(SkillConstants.MAGIC), 99)) * MagicCombat.getDamageBoost(player));
@@ -1194,7 +1194,7 @@ public enum SpecialAttack implements ISpecialAttack {
         combat.delayHit(2, hit);
   }),
 
-    DISRUPT(AttackType.SLASH, new int[] { 27690 }, WEAPON_SPEED, MELEE, new Animation(1378), null, (player, combat, target) -> {
+    DISRUPT(AttackType.SLASH, new int[] { 27690, ItemId.VOIDWAKER_27869, ItemId.CORRUPTED_VOIDWAKER, 29607 }, WEAPON_SPEED, MELEE, new Animation(1378), null, (player, combat, target) -> {
         player.sendSound(new SoundEffect(2945, 5, 25));
         target.setGraphics(new Graphics(2363, 0, 0));
 
@@ -1260,7 +1260,7 @@ public enum SpecialAttack implements ISpecialAttack {
         }
     }),
 
-    CONDEMN(AttackType.MAGIC, new int[] { 27665 }, WEAPON_SPEED, MAGIC, new Animation(9963), new Graphics(2338), (player, combat, target) -> {
+    CONDEMN(AttackType.MAGIC, new int[] { 27665, ItemId.ACCURSED_SCEPTRE_A_27679 }, WEAPON_SPEED, MAGIC, new Animation(9963), new Graphics(2338), (player, combat, target) -> {
         player.cancelCombat();
         Projectile projectile = new Projectile(2339, 23, 15, 51, 23, 25, 64, 5);
         int delay = World.sendProjectile(player, target, projectile);
@@ -1272,6 +1272,261 @@ public enum SpecialAttack implements ISpecialAttack {
             if (hit.isAccurate()) {
                 playerTarget.getSkills().drainPercentageStatically(SkillConstants.DEFENCE, 0.15);
                 playerTarget.getSkills().drainPercentageStatically(SkillConstants.MAGIC, 0.15);
+            }
+        }
+    }),
+
+    // ═══════════════════════════════════════════════════════════════
+    // Rev-239 Special Attacks — auto-generated from spec_attack_registry.py
+    // ═══════════════════════════════════════════════════════════════
+
+    // --- Group A: Simple ---
+
+    PULVERIZE(AttackType.CRUSH, new int[]{21003, 21205, 27100}, WEAPON_SPEED, MELEE, new Animation(11124), new Graphics(2804), (player, combat, target) -> {
+        target.setGraphics(new Graphics(2805));
+        final Hit hit = combat.getHit(player, target, 1.25, 1, 1, false);
+        combat.delayHit(0, hit);
+        if (hit.getDamage() > 0) {
+            target.drainSkill(SkillConstants.DEFENCE, 35.0);
+        }
+    }),
+
+    RETAINER(AttackType.SLASH, new int[]{7639, 7640, 7641, 7642, 7643, 7644, 7645, 7646, 7647, 7648, 22398, 24699, 33718}, WEAPON_SPEED, MELEE, new Animation(8010), null, (player, combat, target) -> {
+        combat.delayHit(0, combat.getHit(player, target, 1, 1, 1, false));
+    }),
+
+    CELEBRATE(AttackType.CRUSH, new int[]{27810}, WEAPON_SPEED, MELEE, new Animation(10036), new Graphics(2364), (player, combat, target) -> {
+        combat.delayHit(0, combat.getHit(player, target, 1, 1, 1, false));
+    }),
+
+    CRYSTALLINE_SEVERANCE(AttackType.STAB, new int[]{30340}, WEAPON_SPEED, MELEE, new Animation(426), new Graphics(1888), (player, combat, target) -> {
+        World.sendProjectile(player, target, new Projectile(1887, 30, 20, 40, 15, 10, 64, 5));
+        combat.delayHit(0, combat.getHit(player, target, 1, 1, 1, false));
+    }),
+
+    // --- Group B: Defence / Stat Drain ---
+
+    DIVISION(AttackType.RANGED, new int[]{28919, 28922}, WEAPON_SPEED, RANGED, new Animation(10914), null, (player, combat, target) -> {
+        final Projectile proj = new Projectile(2727, 30, 20, 40, 15, 10, 64, 5);
+        final int delay = World.sendProjectile(player, target, proj);
+        target.setGraphics(new Graphics(2731, delay, 0));
+        final Hit hit = combat.getHit(player, target, 1, 1, 1, false);
+        if (hit.getDamage() > 0 && target instanceof Player p) {
+            p.getSkills().drainPercentageStatically(SkillConstants.DEFENCE, 0.10);
+        }
+        combat.delayHit(proj.getTime(player.getLocation(), target.getLocation()), hit);
+        if (combat instanceof RangedCombat ranged) {
+            ranged.dropAmmunition(delay, true);
+        }
+    }),
+
+    SOUL_REND(AttackType.MAGIC, new int[]{31113}, WEAPON_SPEED, MAGIC, new Animation(12394), new Graphics(3364), (player, combat, target) -> {
+        target.setGraphics(new Graphics(3365));
+        player.sendSound(new SoundEffect(10329));
+        final Hit hit = combat.getHit(player, target, 2.0, 1.3, 1, false);
+        if (hit.getDamage() > 0 && target instanceof Player p) {
+            p.getSkills().drainPercentageStatically(SkillConstants.MAGIC, 0.10);
+        }
+        combat.delayHit(0, hit);
+    }),
+
+    // --- Group C: Multi-Hit / AoE ---
+
+    LINGERING_LIGHTNING(AttackType.SLASH, new int[]{30388}, WEAPON_SPEED, MELEE, new Animation(11812), new Graphics(3030), (player, combat, target) -> {
+        target.setGraphics(new Graphics(3033));
+        final Hit hit1 = combat.getHit(player, target, 1, 1, 1, false);
+        final Hit hit2 = combat.getHit(player, target, 1, 1, 1, false);
+        combat.delayHit(0, hit1);
+        combat.delayHit(1, hit2);
+        // AoE: hit nearby targets
+        final List<Entity> possibleTargets = player.getPossibleTargets(EntityType.BOTH);
+        possibleTargets.remove(target);
+        possibleTargets.removeIf(e -> e instanceof Player && !player.canHit((Player) e));
+        for (final Entity e : possibleTargets) {
+            if (e != null && e.isMultiArea() && e.getLocation().withinDistance(target.getLocation(), 1)) {
+                combat.delayHit(e, 0, combat.getHit(player, e, 1, 1, 1, false));
+            }
+        }
+    }),
+
+    LIGHTNING_STRIKE(AttackType.SLASH, new int[]{33041}, WEAPON_SPEED, MELEE, new Animation(11812), new Graphics(3030), (player, combat, target) -> {
+        target.setGraphics(new Graphics(3033));
+        final Hit hit1 = combat.getHit(player, target, 1, 1.3, 1, false);
+        final Hit hit2 = combat.getHit(player, target, 1, 1.3, 1, false);
+        combat.delayHit(0, hit1);
+        combat.delayHit(1, hit2);
+        final List<Entity> possibleTargets = player.getPossibleTargets(EntityType.BOTH);
+        possibleTargets.remove(target);
+        possibleTargets.removeIf(e -> e instanceof Player && !player.canHit((Player) e));
+        for (final Entity e : possibleTargets) {
+            if (e != null && e.isMultiArea() && e.getLocation().withinDistance(target.getLocation(), 1)) {
+                combat.delayHit(e, 0, combat.getHit(player, e, 1, 1.3, 1, false));
+            }
+        }
+    }),
+
+    RAPID_BURST(AttackType.RANGED, new int[]{31583}, WEAPON_SPEED, RANGED, new Animation(13145), null, (player, combat, target) -> {
+        final Projectile proj = new Projectile(3486, 30, 20, 40, 15, 10, 64, 5);
+        final int delay = World.sendProjectile(player, target, proj);
+        final int time = proj.getTime(player.getLocation(), target.getLocation());
+        combat.delayHit(time, combat.getHit(player, target, 0.8, 1.1, 1, false));
+        combat.delayHit(time + 1, combat.getHit(player, target, 0.8, 1.1, 1, false));
+        if (combat instanceof RangedCombat ranged) {
+            ranged.dropAmmunition(delay, true);
+        }
+    }),
+
+    // --- Group D: Burn / DoT ---
+
+    FLAMES_OF_RALOS(AttackType.SLASH, new int[]{30955}, WEAPON_SPEED, MELEE, new Animation(12297), new Graphics(3336), (player, combat, target) -> {
+        final Hit hit = combat.getHit(player, target, 1.5, 1.5, 1, false);
+        combat.delayHit(0, hit);
+        if (hit.getDamage() > 0) {
+            target.getToxins().applyToxin(ToxinType.POISON, 6);
+        }
+    }),
+
+    ECLIPSE(AttackType.RANGED, new int[]{29000, 29851}, WEAPON_SPEED, RANGED, new Animation(11060), new Graphics(2794), (player, combat, target) -> {
+        final Projectile proj = new Projectile(2795, 30, 20, 40, 15, 10, 64, 5);
+        final int delay = World.sendProjectile(player, target, proj);
+        target.setGraphics(new Graphics(2798, delay, 0));
+        player.sendSound(new SoundEffect(8642));
+        final Hit hit = combat.getHit(player, target, 1.5, 1, 1, false);
+        combat.delayHit(proj.getTime(player.getLocation(), target.getLocation()), hit);
+        if (combat instanceof RangedCombat ranged) {
+            ranged.dropAmmunition(delay, true);
+        }
+    }),
+
+    // --- Group E: Instant ---
+
+    FEROCITY(AttackType.STAB, new int[]{33249}, 0, MELEE, new Animation(13754), null, (player, combat, target) -> {
+        player.sendSound(new SoundEffect(11318));
+        combat.delayHit(0, combat.getHit(player, target, 1, 1, 1, false));
+    }),
+
+    EXPLOSIVE_SHATTER(AttackType.CRUSH, new int[]{33255}, 0, MELEE, new Animation(13761), new Graphics(3750), (player, combat, target) -> {
+        final Projectile proj = new Projectile(3751, 30, 20, 40, 15, 10, 64, 5);
+        World.sendProjectile(player, target, proj);
+        target.setGraphics(new Graphics(3752));
+        combat.delayHit(0, combat.getHit(player, target, 1, 1, 1, false));
+    }),
+
+    VIRULENCE(AttackType.SLASH, new int[]{29796, 33178}, 0, MELEE, new Animation(11513), new Graphics(2930), (player, combat, target) -> {
+        final Hit hit = combat.getHit(player, target, 1, 1, 1, false);
+        combat.delayHit(0, hit);
+        if (hit.getDamage() > 0) {
+            target.getToxins().applyToxin(ToxinType.POISON, 8);
+        }
+    }),
+
+    // --- Group F: Unique Mechanics ---
+
+    BEHEAD(AttackType.SLASH, new int[]{28338, 33335}, WEAPON_SPEED, MELEE, new Animation(10173), new Graphics(2430), (player, combat, target) -> {
+        final Hit hit = combat.getHit(player, target, 1, 1, 1, false);
+        combat.delayHit(0, hit);
+        if (hit.getDamage() > 0) {
+            // Soulreaper stacking: each spec adds a stack (max 5), +6% max hit per stack, costs 8 HP
+            int stacks = player.getNumericTemporaryAttribute("soulreaper_stacks").intValue();
+            stacks = Math.min(stacks + 1, 5);
+            player.addTemporaryAttribute("soulreaper_stacks", stacks);
+            player.applyHit(new Hit(8, HitType.REGULAR));
+            // Heal 1/4 of damage dealt
+            player.heal(hit.getDamage() / 4);
+        }
+    }),
+
+    BLOOD_INFUSION(AttackType.SLASH, new int[]{28997, 29850}, WEAPON_SPEED, MELEE, new Animation(10990), new Graphics(2792), (player, combat, target) -> {
+        player.sendSound(new SoundEffect(7917));
+        // Guaranteed hit (skip accuracy roll)
+        final int maxHit = combat.getMaxHit(player, 1.25, 1, false);
+        final int damage = Utils.random(1, (int) (maxHit * 1.25));
+        final Hit hit = new Hit(player, damage, HitType.MELEE);
+        combat.delayHit(0, hit);
+        // Self-damage: 20% of damage dealt
+        if (hit.getDamage() > 0) {
+            player.applyHit(new Hit(hit.getDamage() / 5, HitType.REGULAR));
+        }
+    }),
+
+    BREAK_SHACKLES(AttackType.STAB, new int[]{28988, 29849}, WEAPON_SPEED, MELEE, new Animation(11055), new Graphics(2791), (player, combat, target) -> {
+        final Hit hit = combat.getHit(player, target, 1, 1, 1, false);
+        combat.delayHit(0, hit);
+        if (hit.getDamage() > 0) {
+            // Bind duration scales with player's missing HP
+            final double missingPct = 1.0 - ((double) player.getHitpoints() / player.getMaxHitpoints());
+            final int bindTicks = (int) (8 + (missingPct * 16)); // 8-24 ticks
+            target.freezeWithNotification(bindTicks);
+        }
+    }),
+
+    BRUTAL_SWING(AttackType.CRUSH, new int[]{33631}, WEAPON_SPEED, MELEE, new Animation(14255), new Graphics(3908), (player, combat, target) -> {
+        player.sendSound(new SoundEffect(11874));
+        // Multi-accuracy-roll: roll accuracy 3 times, if ANY hits, the attack hits
+        boolean anyHit = false;
+        for (int i = 0; i < 3; i++) {
+            if (combat.isSuccessful(player, target, 1, AttackType.CRUSH)) {
+                anyHit = true;
+                break;
+            }
+        }
+        if (anyHit) {
+            final int damage = Utils.random(1, combat.getMaxHit(player, 1, 1, false));
+            combat.delayHit(0, new Hit(player, damage, HitType.MELEE));
+        } else {
+            combat.delayHit(0, new Hit(player, 0, HitType.MELEE));
+        }
+    }),
+
+    ECHO_SLASH(AttackType.SLASH, new int[]{30367}, WEAPON_SPEED, MELEE, new Animation(11893), null, (player, combat, target) -> {
+        // Triggers all godsword effects: damage boost + heal + freeze + stat drain
+        final Hit hit = combat.getHit(player, target, 2.0, 1.375, 1.25, false);
+        combat.delayHit(0, hit);
+        if (hit.getDamage() > 0) {
+            // Healing Blade effect
+            final int healAmount = hit.getDamage() / 2;
+            player.heal(healAmount);
+            // Ice Cleave effect
+            target.freezeWithNotification(20);
+            target.setGraphics(new Graphics(369));
+            // Warstrike effect
+            if (target instanceof Player p) {
+                p.getSkills().drainPercentageStatically(SkillConstants.DEFENCE, 0.10);
+                p.getSkills().drainPercentageStatically(SkillConstants.STRENGTH, 0.10);
+                p.getSkills().drainPercentageStatically(SkillConstants.ATTACK, 0.10);
+                p.getSkills().drainPercentageStatically(SkillConstants.MAGIC, 0.10);
+                p.getSkills().drainPercentageStatically(SkillConstants.RANGED, 0.10);
+            } else {
+                target.drainSkill(SkillConstants.DEFENCE, 10.0);
+            }
+        }
+    }),
+
+    ENTICE(AttackType.CRUSH, new int[]{30759}, WEAPON_SPEED, MELEE, new Animation(12150), new Graphics(3282), (player, combat, target) -> {
+        target.setGraphics(new Graphics(3283));
+        final Hit hit = combat.getHit(player, target, 1, 1, 1, false);
+        combat.delayHit(0, hit);
+        // TODO: team accuracy buff — apply a temporary accuracy modifier to nearby allies
+        // Needs: scan players in area, add TickVariable for accuracy buff duration
+    }),
+
+    SEEKING_LUNGE(AttackType.STAB, new int[]{33722}, WEAPON_SPEED, MELEE, new Animation(14259), new Graphics(3941), (player, combat, target) -> {
+        player.sendSound(new SoundEffect(11876));
+        // Fixed percentage of target's current HP as damage
+        final int damage = Math.max(1, target.getHitpoints() / 10); // 10% of current HP
+        combat.delayHit(0, new Hit(player, damage, HitType.MELEE));
+    }),
+
+    SOL_SLAM(AttackType.CRUSH, new int[]{30369}, WEAPON_SPEED, MELEE, new Animation(1203), null, (player, combat, target) -> {
+        // AoE melee attack (animation data missing from registry, using generic)
+        final Hit primaryHit = combat.getHit(player, target, 1, 1, 1, false);
+        combat.delayHit(0, primaryHit);
+        final List<Entity> possibleTargets = player.getPossibleTargets(EntityType.BOTH);
+        possibleTargets.remove(target);
+        possibleTargets.removeIf(e -> e instanceof Player && !player.canHit((Player) e));
+        for (final Entity e : possibleTargets) {
+            if (e != null && e.isMultiArea() && e.getLocation().withinDistance(target.getLocation(), 1)) {
+                combat.delayHit(e, 0, combat.getHit(player, e, 1, 1, 1, false));
             }
         }
     }),
