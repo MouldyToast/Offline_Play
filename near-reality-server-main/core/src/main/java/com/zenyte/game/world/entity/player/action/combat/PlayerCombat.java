@@ -147,9 +147,9 @@ public abstract class PlayerCombat extends Action {
             "axe", "morrigan's javelin", "chinchompa", "toktz-xil-ul", "holy water", "mud pie", "crystal bow", "bow " +
             "of faerdhinen",
             "saradomin bow", "bandos bow", "armadyl bow", "zamorak bow",
-            "corrupted bow", "starter bow", "craw's bow"};
+            "corrupted bow", "starter bow", "craw's bow", "tonalztics"};
     private static final String[] RANGED_WEAPONS = new String[]{"bow", "javelin", "thrownaxe", "throwing axe", "knife", "knives"
-            , "chinchompa", "toktz-xil-ul", "holy water", "dart", "ballista", "blowpipe", "seercull", "mud pie"};
+            , "chinchompa", "toktz-xil-ul", "holy water", "dart", "ballista", "blowpipe", "seercull", "mud pie", "tonalztics"};
     private static final IntSet nonRangedWeapons = new IntOpenHashSet(new int[]{ItemId.KITCHEN_KNIFE});
     private static final Animation DRAGONFIRE_SPECIAL_ANIM = new Animation(6696);
     private static final Graphics DRAGONFIRE_START_GFX = new Graphics(1165);
@@ -246,7 +246,7 @@ public abstract class PlayerCombat extends Action {
 
     public static boolean isKerisWeapon(final int weaponId) {
         return switch (weaponId) {
-            case ItemId.KERIS, ItemId.KERISP, ItemId.KERISP_10583, ItemId.KERISP_10584, ItemId.KERIS_PARTISAN, ItemId.KERIS_PARTISAN_OF_BREACHING, ItemId.KERIS_PARTISAN_OF_CORRUPTION, ItemId.KERIS_PARTISAN_OF_THE_SUN -> true;
+            case ItemId.KERIS, ItemId.KERISP, ItemId.KERISP_10583, ItemId.KERISP_10584, ItemId.KERIS_PARTISAN, ItemId.KERIS_PARTISAN_OF_BREACHING, ItemId.KERIS_PARTISAN_OF_CORRUPTION, ItemId.KERIS_PARTISAN_OF_THE_SUN, ItemId.KERIS_PARTISAN_OF_AMASCUT -> true; // 30891
             default -> false;
         };
     }
@@ -260,7 +260,7 @@ public abstract class PlayerCombat extends Action {
 
     public static boolean isOsmumtenFang(final int weaponId) {
         return switch (weaponId) {
-            case ItemId.OSMUMTENS_FANG, ItemId.OSMUMTENS_FANG_OR -> true;
+            case ItemId.OSMUMTENS_FANG, ItemId.OSMUMTENS_FANG_OR, ItemId.OSMUMTEN_S_FANG -> true; // 33174 deadman
             default -> false;
         };
     }
@@ -378,6 +378,14 @@ public abstract class PlayerCombat extends Action {
             return;
         } else if (spell == CombatSpell.DAWNBRINGER) {
             player.getActionManager().setAction(new DawnbringerCombat(entity, spell, castType));
+            return;
+        } else if (spell == CombatSpell.EYE_OF_AYAK) {
+            player.getActionManager().setAction(new MagicCombat(entity, spell, castType) {
+                @Override
+                protected int attackSpeed() {
+                    return 3;
+                }
+            });
             return;
         } else if (spell == CombatSpell.CRYSTAL_STAFF || spell == CombatSpell.CORRUPTED_STAFF) {
             player.getActionManager().setAction(new GauntletStaffSpell(entity, spell, castType));
@@ -543,7 +551,7 @@ public abstract class PlayerCombat extends Action {
             }
         }
         if (weapon != null) {
-            if (weapon.getId() == 21015) {
+            if (weapon.getId() == 21015 || weapon.getId() == ItemId.DINHS_BLAZING_BULWARK || weapon.getId() == ItemId.DINH_S_BLAZING_BULWARK) { // 28682, 31132
                 if (spell != null) {
                     player.sendMessage("Your bulwark gets in the way.");
                     return;
@@ -577,25 +585,33 @@ public abstract class PlayerCombat extends Action {
         if (weapon == null || weapon.getId() == 6818 || weapon.getId() == ItemId.HUNTING_KNIFE) {
             player.getActionManager().setAction(new MeleeCombat(entity));
             return;
-        } else if (player.getCombatDefinitions().getAutocastSpell() != null) {
+        } else if (player.getCombatDefinitions().getAutocastSpell() != null
+                && weapon.getId() != ItemId.EYE_OF_AYAK
+                && weapon.getId() != ItemId.EYE_OF_AYAK_UNCHARGED) {
             magicAttack(player, entity, player.getCombatDefinitions().getAutocastSpell(), true);
             return;
-        }
-        if (weapon.getId() == 22335) {
+        } else if (weapon.getId() == 22335) {
             magicAttack(player, entity, CombatSpell.STARTER_STAFF, true);
             return;
-        }
-        if (weapon.getId() == ItemId.DAWNBRINGER) {
+        } else if (weapon.getId() == ItemId.DAWNBRINGER) {
             magicAttack(player, entity, CombatSpell.DAWNBRINGER, true);
             return;
-        }
-        if (weapon.getId() == ItemId.SANGUINESTI_STAFF || weapon.getId() == ItemId.HOLY_SANGUINESTI_STAFF) {
+        } else if (weapon.getId() == ItemId.EYE_OF_AYAK) {
+            magicAttack(player, entity, CombatSpell.EYE_OF_AYAK, true);
+            return;
+        } else if (weapon.getId() == ItemId.EYE_OF_AYAK_UNCHARGED) {
+            player.sendMessage("The Eye of Ayak has no charges. Charge it with death runes and chaos runes, or demon tears.");
+            return;
+        } else if (weapon.getId() == ItemId.SANGUINESTI_STAFF || weapon.getId() == ItemId.HOLY_SANGUINESTI_STAFF) {
             magicAttack(player, entity, CombatSpell.SANGUINESTI_STAFF, true);
             return;
-        } else if (weapon.getId() == ItemId.TUMEKENS_SHADOW || weapon.getId() == ItemId.TUMEKENS_SHADOW_UNCHARGED) {
+        } else if (weapon.getId() == ItemId.TUMEKENS_SHADOW || weapon.getId() == ItemId.TUMEKENS_SHADOW_UNCHARGED
+                || weapon.getId() == ItemId.CORRUPTED_TUMEKENS_SHADOW || weapon.getId() == ItemId.CORRUPTED_TUMEKENS_SHADOW_UNCHARGED) { // 28547, 28549
             magicAttack(player, entity, CombatSpell.TUMEKENS_SHADOW, true);
             return;
-        } else if (weapon.getId() == 11905 || weapon.getId() == 11907 || weapon.getId() == ItemId.TRIDENT_OF_THE_SEAS_E) {
+        } else if (weapon.getId() == 11905 || weapon.getId() == 11907 || weapon.getId() == ItemId.TRIDENT_OF_THE_SEAS_E
+                || weapon.getId() == ItemId.TRIDENT_OF_THE_SEAS_O || weapon.getId() == ItemId.TRIDENT_OF_THE_SEAS_FULL_O
+                || weapon.getId() == ItemId.TRIDENT_OF_THE_SEAS_E_O) { // ornament variants
             magicAttack(player, entity, CombatSpell.TRIDENT_OF_THE_SEAS, true);
             return;
         } else if (weapon.getId() == 23898 || weapon.getId() == 23899 || weapon.getId() == 23900) {
@@ -604,20 +620,24 @@ public abstract class PlayerCombat extends Action {
         } else if (weapon.getId() == 23852 || weapon.getId() == 23853 || weapon.getId() == 23854) {
             magicAttack(player, entity, CombatSpell.CORRUPTED_STAFF, true);
             return;
-        } else if (weapon.getId() == 11908 || weapon.getId() == 22290) {
+        } else if (weapon.getId() == 11908 || weapon.getId() == 22290
+                || weapon.getId() == ItemId.UNCHARGED_TRIDENT_O || weapon.getId() == ItemId.UNCHARGED_TRIDENT_E_O
+                || weapon.getId() == ItemId.UNCHARGED_TOXIC_TRIDENT_O || weapon.getId() == ItemId.UNCHARGED_TOXIC_TRIDENT_E_O) { // ornament uncharged
             player.sendMessage("The weapon has no charges left. You need death runes, chaos runes, fire runes and " +
                     "coins to charge it.");
             return;
-        } else if (weapon.getId() == ItemId.TRIDENT_OF_THE_SWAMP || weapon.getId() == ItemId.TRIDENT_OF_THE_SWAMP_E) {
+        } else if (weapon.getId() == ItemId.TRIDENT_OF_THE_SWAMP || weapon.getId() == ItemId.TRIDENT_OF_THE_SWAMP_E
+                || weapon.getId() == ItemId.TRIDENT_OF_THE_SWAMP_O || weapon.getId() == ItemId.TRIDENT_OF_THE_SWAMP_E_O) { // ornament variants
             magicAttack(player, entity, CombatSpell.TRIDENT_OF_THE_SWAMP, true);
             return;
-        } else if(weapon.getId() == CustomItemId.POLYPORE_STAFF) {
+        } else if (weapon.getId() == CustomItemId.POLYPORE_STAFF) {
             magicAttack(player, entity, CombatSpell.POLYPORE_STAFF, true);
             return;
-        }else if (weapon.getId() == ItemId.THAMMARONS_SCEPTRE || weapon.getId() == ItemId.THAMMARONS_SCEPTRE_U) {
+        } else if (weapon.getId() == ItemId.THAMMARONS_SCEPTRE || weapon.getId() == ItemId.THAMMARONS_SCEPTRE_U) {
             magicAttack(player, entity, CombatSpell.THAMMARONS_SCEPTRE, true);
             return;
-        } else if (weapon.getId() == 27662 || weapon.getId() == 27665) {
+        } else if (weapon.getId() == 27662 || weapon.getId() == 27665
+                || weapon.getId() == ItemId.ACCURSED_SCEPTRE_AU_27676 || weapon.getId() == ItemId.ACCURSED_SCEPTRE_A_27679) { // attuned variants
             magicAttack(player, entity, CombatSpell.ACCURSED_SCEPTRE, true);
             return;
         }
@@ -649,7 +669,7 @@ public abstract class PlayerCombat extends Action {
             player.getActionManager().setAction(new CrawsBowCombat(entity, crawAmmo));
         } else if ((weaponName.contains("salamander") || weaponName.equals("swamp lizard"))) {
             player.getActionManager().setAction(new SalamanderCombat(entity, defs));
-        } else if (weaponName.equals("toxic blowpipe")) {
+        } else if (weaponName.equals("toxic blowpipe") || weaponName.equals("blazing blowpipe")) { // 28688
             player.getActionManager().setAction(new BlowpipeRangedCombat(entity, defs));
         } else if (weaponName.equals("dark bow")) {
             player.getActionManager().setAction(new DarkBowRangedCombat(entity, defs));
@@ -663,13 +683,15 @@ public abstract class PlayerCombat extends Action {
             player.getActionManager().setAction(GodBow.Zamorak.INSTANCE.createCombat(entity));
         } else if (weapon.getId() == CustomItemId.ARMADYL_BOW) {
             player.getActionManager().setAction(GodBow.Armadyl.INSTANCE.createCombat(entity));
+        } else if (weaponName.contains("tonalztics")) { // 28919, 28922
+            player.getActionManager().setAction(new TonalzticsCombat(entity, defs));
         } else if (isRangedWeapon(weapon.getId(), weaponName)) {
             player.getActionManager().setAction(new RangedCombat(entity, defs));
         } else if (weaponName.equals("granite maul")) {
             player.getActionManager().setAction(new GraniteMaulCombat(entity));
-        } else if (weaponName.equals("sanguine scythe of vitur") || weaponName.equals("holy scythe of vitur") || weaponName.equals("scythe of vitur") || weaponName.equalsIgnoreCase("christmas scythe")) {
+        } else if (weaponName.contains("scythe of vitur") || weaponName.equalsIgnoreCase("christmas scythe")) { // catches corrupted/sanguine/holy variants
             player.getActionManager().setAction(new ScytheOfViturCombat(entity));
-        } else if (weaponName.equals("dinh's bulwark")) {
+        } else if (weaponName.contains("dinh's") && weaponName.contains("bulwark")) { // catches blazing variant
             player.getActionManager().setAction(new DinhsBulwarkCombat(entity));
         } else if (weaponName.contains("guthan")) {
             player.getActionManager().setAction(new GuthanCombat(entity));
@@ -682,13 +704,21 @@ public abstract class PlayerCombat extends Action {
         else if (weapon.getId() == CustomItemId.LAVA_WHIP)  player.getActionManager().setAction(new LavaWhipCombat(entity));
         else if (weapon.getId() == ItemId.URSINE_CHAINMACE_27660)   player.getActionManager().setAction(new UrsineChainmaceCombat(entity));
         else if (weapon.getId() == ItemId.VIGGORAS_CHAINMACE) player.getActionManager().setAction(new ViggoraChainmaceCombat(entity));
-        else if (weapon.getId() == ItemId.BLISTERWOOD_FLAIL)    player.getActionManager().setAction(new BlisterwoodFlailCombat(entity));
+        else if (weapon.getId() == ItemId.BLISTERWOOD_FLAIL || weapon.getId() == ItemId.HALLOWED_FLAIL)    player.getActionManager().setAction(new BlisterwoodFlailCombat(entity)); // 33718
         else if (weapon.getId() == ItemId.IVANDIS_FLAIL) {
             player.getActionManager().setAction(new IvandisFlailCombat(entity));
         } else if (isOsmumtenFang(weapon.getId())) {
             player.getActionManager().setAction(new OsmumtenFangCombat(entity));
         } else if (isKerisWeapon(weapon.getId())) {
             player.getActionManager().setAction(new KerisCombat(entity));
+        } else if (weapon.getId() == ItemId.SOULREAPER_AXE_28338 || weapon.getId() == ItemId.SOULREAPER_AXE_O) { // 28338, 33335
+            player.getActionManager().setAction(new SoulreaperAxeCombat(entity));
+        } else if (weapon.getId() == ItemId.NOXIOUS_HALBERD || weapon.getId() == ItemId.NOXIOUS_HALBERD_33178) { // 29796, 33178
+            player.getActionManager().setAction(new NoxiousHalberdCombat(entity));
+        } else if (weapon.getId() == ItemId.SUNSPEAR) { // 33722
+            player.getActionManager().setAction(new SunspearCombat(entity));
+        } else if (weaponName.contains("dual macuahuitl")) { // 28997, 29850
+            player.getActionManager().setAction(new DualMacuahuitlCombat(entity));
         } else {
             player.getActionManager().setAction(new MeleeCombat(entity));
         }
