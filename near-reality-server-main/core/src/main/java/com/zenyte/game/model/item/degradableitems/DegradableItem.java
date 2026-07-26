@@ -160,6 +160,8 @@ public enum DegradableItem implements Degradeable {
 	TRIDENT_OF_THE_SWAMP_E(DegradeType.TRIDENT, ItemId.TRIDENT_OF_THE_SWAMP_E, ItemId.UNCHARGED_TOXIC_TRIDENT_E, 20000, 0, item -> new Item[]{new Item(12934, item.getCharges())}),
 	IBANS_STAFF(DegradeType.IBANS_BLAST, 1409, 1410, 120, 0),
     UPGRADED_IBANS_STAFF(DegradeType.IBANS_BLAST, 12658, 1410, 2500, 0),
+    IBANS_STAFF_O(DegradeType.IBANS_BLAST, 33330, 1410, 120, 0), // ornament
+    UPGRADED_IBANS_STAFF_O(DegradeType.IBANS_BLAST, 33332, 1410, 2500, 0), // ornament (u)
     FULL_SARADOMIN_BLESSED_SWORD(DegradeType.OUTGOING_HIT, 12808, 12809, 0, 0),
     SARADOMIN_BLESSED_SWORD(DegradeType.OUTGOING_HIT, 12809, 12804, 10000, 0),
     TOXIC_STAFF_OF_THE_DEAD(DegradeType.SPELL, 12904, 12902, SerpentineHelmetChargingAction.MAX_CHARGES, 0, item -> new Item[]{new Item(12934, (int) (item.getCharges() * SerpentineHelmetChargingAction.SCALES_TO_CHARGES_RATIO))}),
@@ -254,6 +256,7 @@ public enum DegradableItem implements Degradeable {
     HOLY_SANGUINESTI_STAFF(DegradeType.TRIDENT, ItemId.HOLY_SANGUINESTI_STAFF, ItemId.HOLY_SANGUINESTI_STAFF_UNCHARGED, 20000, 0),
     TUMEKENS_SHADOW(DegradeType.TRIDENT, ItemId.TUMEKENS_SHADOW, ItemId.TUMEKENS_SHADOW_UNCHARGED, 20000, 0,
             item -> new Item[]{new Item(ItemId.SOUL_RUNE, item.getCharges() * TOAConstants.SOUL_RUNES_MOD), new Item(ItemId.CHAOS_RUNE, item.getCharges() * TOAConstants.CHAOS_RUNES_MOD)}),
+    EYE_OF_AYAK(DegradeType.TRIDENT, ItemId.EYE_OF_AYAK, ItemId.EYE_OF_AYAK_UNCHARGED, 50000, 0),
     CRAWS_BOW(DegradeType.OUTGOING_HIT, 22550, 22547, 17000, 0),
 
     WEBWEAVER_BOW(DegradeType.OUTGOING_HIT, 27655, 27652, 17000, 0),
