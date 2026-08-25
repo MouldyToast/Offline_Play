@@ -3,7 +3,8 @@ package com.near_reality.network.rsprot
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
-import mgi.tools.jagcached.cache.Archive
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet
+import mgi.tools.jagcached.Helper
 import mgi.tools.jagcached.cache.Cache
 import net.rsprot.protocol.api.js5.Js5GroupProvider
 import org.slf4j.LoggerFactory
@@ -30,8 +31,8 @@ class ZenyteJs5GroupProvider : Js5GroupProvider {
     private val logger = LoggerFactory.getLogger(ZenyteJs5GroupProvider::class.java)
     private val groups = Int2ObjectOpenHashMap<ByteBuf>(131_072)
 
-    /** Archive 5 of the client cache — used to answer [hasMapSquare]. */
-    private var mapsArchive: Archive? = null
+    /** Name hashes of every group in archive 5, or empty if the cache lib could not read them. */
+    private var mapGroupNames: IntOpenHashSet = IntOpenHashSet()
 
     init {
         load()
@@ -48,7 +49,14 @@ class ZenyteJs5GroupProvider : Js5GroupProvider {
 
         val cache = Cache.openCache(path, true)
         val archiveCount = cache.archiveCount
-        mapsArchive = cache.getArchive(ARCHIVE_MAPS)
+        mapGroupNames = readMapGroupNames(cache)
+        if (mapGroupNames.isEmpty()) {
+            logger.warn(
+                "Archive {} carries no group name hashes — hasMapSquare() will fail open and " +
+                    "no login relocation will occur.",
+                ARCHIVE_MAPS,
+            )
+        }
 
         // Encode regular groups for each archive that exists
         for (archiveId in 0 until archiveCount) {
@@ -57,7 +65,8 @@ class ZenyteJs5GroupProvider : Js5GroupProvider {
             var highestGroup = -1
             for (groupId in 0..index.groupCount()) {
                 val rawData = index.get(groupId)?.buffer ?: continue
-                groups[bitpack(archiveId, groupId)] = encodeGroup(archiveId, groupId, rawData)
+                groups[bitpack(archiveId, groupId)] =
+                    encodeGroup(archiveId, groupId, rawData, stripVersion = true)
                 highestGroup = groupId
             }
             // The client sizes its interface / clientscript tables from these archives.
@@ -74,7 +83,8 @@ class ZenyteJs5GroupProvider : Js5GroupProvider {
             for (archiveId in 0 until archiveCount) {
                 if (cache.getArchive(archiveId) == null) continue
                 val refData = masterIndex.get(archiveId)?.buffer ?: continue
-                groups[bitpack(255, archiveId)] = encodeGroup(255, archiveId, refData)
+                groups[bitpack(255, archiveId)] =
+                    encodeGroup(255, archiveId, refData, stripVersion = false)
             }
         }
 
@@ -108,10 +118,30 @@ class ZenyteJs5GroupProvider : Js5GroupProvider {
          */
         @JvmStatic
         fun hasMapSquare(regionId: Int): Boolean {
-            val archive = instance?.mapsArchive ?: return true
+            val names = instance?.mapGroupNames ?: return true
+            // Fail open: an empty set means we cannot answer, not that the region is absent.
+            if (names.isEmpty()) return true
             val x = regionId shr 8
             val y = regionId and 0xFF
-            return archive.findGroupByName("m${x}_$y") != null
+            return names.contains(Helper.strToI("m${x}_$y"))
+        }
+
+        /**
+         * Collects archive 5's group name hashes. Returns empty (fail-open) when the archive is
+         * missing or its reference table carries no names — Archive.load only records a name
+         * when `groupName >= 0`, so an unset/misread `useNames` flag yields -1 for every group.
+         * Never treat empty as "this cache has no maps".
+         */
+        private fun readMapGroupNames(cache: Cache): IntOpenHashSet {
+            val names = IntOpenHashSet(2048)
+            val archive = cache.getArchive(ARCHIVE_MAPS) ?: return names
+            val groups = archive.groups ?: return names
+            for (group in groups) {
+                if (group == null) continue
+                val name = group.name
+                if (name != -1) names.add(name)
+            }
+            return names
         }
 
         /** Number of interfaces in the cache the CLIENT loads (0 = unknown). */
@@ -162,15 +192,26 @@ class ZenyteJs5GroupProvider : Js5GroupProvider {
             container[4] = size.toByte()
             System.arraycopy(entryData, 0, container, 5, entryData.size)
 
-            return encodeGroup(255, 255, container)?.let {
-                // encodeGroup already wraps in unreleasableBuffer via the return
-                // but we handle it in the caller
-                it
-            }
+            return encodeGroup(255, 255, container, stripVersion = false)
         }
 
-        private fun encodeGroup(archive: Int, group: Int, data: ByteArray): ByteBuf {
-            if (data.size < 5) return Unpooled.unreleasableBuffer(Unpooled.EMPTY_BUFFER)
+        /**
+         * @param stripVersion drop the trailing 2-byte version that Helper.encodeContainer
+         * appends when `isFITContainer` is false. TRUE for every regular group (written via
+         * Helper.encodeFilesContainer); FALSE for (255,255) and the (255, archiveId) reference
+         * tables (written via Helper.encodeFITContainer, which omits it). Matches OpenRune's
+         * CacheJs5GroupProvider.encodeGroupBuffer and RSProt's Js5Service.prepareJs5Buffer
+         * ("input byte buffer from the cache, with version information stripped off").
+         * Leaving the trailer on desynchronises the client's JS5 stream after the first group.
+         */
+        private fun encodeGroup(
+            archive: Int,
+            group: Int,
+            data: ByteArray,
+            stripVersion: Boolean,
+        ): ByteBuf {
+            val storedLen = if (stripVersion && data.size >= 2) data.size - 2 else data.size
+            if (storedLen < 5) return Unpooled.unreleasableBuffer(Unpooled.EMPTY_BUFFER)
 
             // First 5 bytes of raw cache data: [compression:1][compressedSize:4]
             val compression = data[0].toInt() and 0xFF
@@ -179,8 +220,8 @@ class ZenyteJs5GroupProvider : Js5GroupProvider {
                     ((data[3].toInt() and 0xFF) shl 8) or
                     (data[4].toInt() and 0xFF)
 
-            // Payload is everything after the 5-byte cache container header
-            val payload = data.copyOfRange(5, data.size)
+            // Payload is everything after the 5-byte container header, minus the version trailer
+            val payload = data.copyOfRange(5, storedLen)
             val payloadLen = payload.size
 
             // Calculate block separators needed
