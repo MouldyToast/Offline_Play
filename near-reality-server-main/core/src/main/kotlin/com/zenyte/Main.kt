@@ -130,6 +130,7 @@ object Main {
             val factory = ZenyteNetworkFactory(connectionHandler, messageConsumers)
             rspService = factory.build()
             rspService.setCommunicationThread(worldThread)
+            com.near_reality.network.rsprot.RspService.service = rspService
             rspService.start()
         }
 
