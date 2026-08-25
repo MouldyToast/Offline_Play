@@ -1,6 +1,7 @@
 package com.near_reality.network.rsprot
 
 import com.zenyte.cores.CoresManager
+import com.zenyte.game.task.WorldTasksManager
 import com.zenyte.game.GameConstants
 import com.zenyte.game.world.World
 import com.zenyte.game.world.entity.player.Player
@@ -82,7 +83,7 @@ class ZenyteConnectionHandler(
             username,
             password,
             1, // display mode (resizable)
-            null, // UUID byte[] — not available from RSProt login block
+            ByteArray(0), // UUID byte[] — empty, not null (PlayerUUID.isEmpty requires non-null)
             null, // HardwareInfo — not available from RSProt login block
         )
 
@@ -109,11 +110,16 @@ class ZenyteConnectionHandler(
                 return@load
             }
 
-            try {
-                completeLogin(responseHandler, player, block)
-            } catch (e: Exception) {
-                logger.error("Failed to complete login for {}", username, e)
-                responseHandler.writeFailedResponse(LoginResponse.LoginServerLoadError)
+            // Defer to World Thread — RSProt's InfoProtocols.alloc() and
+            // World.addPlayer() must run on the communication thread.
+            // This mirrors NR's original LoginRequest.postLogin() pattern.
+            WorldTasksManager.schedule {
+                try {
+                    completeLogin(responseHandler, player, block)
+                } catch (e: Exception) {
+                    logger.error("Failed to complete login for {}", username, e)
+                    responseHandler.writeFailedResponse(LoginResponse.LoginServerLoadError)
+                }
             }
         }
     }
@@ -154,6 +160,7 @@ class ZenyteConnectionHandler(
 
         // Create our Session adapter and set it on the player
         val rspClient = ZenyteRspClient(session, infos)
+        rspClient.player = player
         player.session = rspClient
 
         player.createLogger()
