@@ -1,6 +1,8 @@
 package com.zenyte.game.packet.out;
 
 import com.zenyte.game.packet.GamePacketEncoder;
+import com.zenyte.game.packet.ZoneProtConvertible;
+import com.zenyte.game.packet.ZoneProts;
 import com.zenyte.game.world.Position;
 import com.zenyte.game.world.Projectile;
 import com.zenyte.game.world.entity.Location;
@@ -15,7 +17,12 @@ import org.jetbrains.annotations.NotNull;
  * @author Tommeh | 28 jul. 2018 | 18:31:35
  * @see <a href="https://www.rune-server.ee/members/tommeh/">Rune-Server profile</a>}
  */
-public final class MapProjAnim implements GamePacketEncoder {
+public final class MapProjAnim implements GamePacketEncoder, ZoneProtConvertible {
+
+	@Override
+	public net.rsprot.protocol.message.ZoneProt toZoneProt(@NotNull final Player player) {
+		return ZoneProts.mapProjAnim(fromPosition, target, projectile, duration, offset);
+	}
 
 	private final Player player;
 	private final Projectile projectile;
