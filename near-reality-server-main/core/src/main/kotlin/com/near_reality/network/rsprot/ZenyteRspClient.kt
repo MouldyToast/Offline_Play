@@ -30,6 +30,9 @@ class ZenyteRspClient(
     val infos: Infos,
 ) : Session {
 
+    /** Set by ZenyteConnectionHandler after login completes. */
+    lateinit var player: Player
+
     private val logger = LoggerFactory.getLogger(ZenyteRspClient::class.java)
 
     // --- NR Session interface ---
@@ -40,13 +43,15 @@ class ZenyteRspClient(
 
     /**
      * Drains incoming packets from RSProt and dispatches them to the player.
-     * Called once per tick from WorldThread -> WorldSubHandler.process() equivalent.
+     * Called once per tick from WorldThread.processPlayerSessions().
      *
-     * In Session 11a this returns true (no incoming packets wired yet — that's 11b).
-     * In Session 11b, this calls rspSession.processIncomingPackets(player).
+     * RSProt's processIncomingPackets reads from the internal packet queue,
+     * decodes each message, and calls the matching MessageConsumer registered
+     * in ZenyteMessageConsumers. Each consumer creates the NR event and calls
+     * event.handle(player), which runs the existing game logic.
      */
     override fun process(): Boolean {
-        // Session 11b will add: rspSession.processIncomingPackets(player)
+        rspSession.processIncomingPackets(player)
         return true
     }
 
