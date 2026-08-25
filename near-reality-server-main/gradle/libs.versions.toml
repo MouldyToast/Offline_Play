@@ -17,6 +17,7 @@ jackson = "2.18.3"
 javaparser = "3.26.4"
 
 runelite = "1.9.8"
+rsprot = "1.0.0-ALPHA-20260804"
 
 [plugins]
 
@@ -127,6 +128,9 @@ toml4j = { module = "io.hotmoka:toml4j", version = "0.7.3" }
 
 runelite-api = { module = "net.runelite:runelite-api", version.ref = "runelite" }
 runelite-cache = { module = "net.runelite:cache", version.ref = "runelite" }
+
+rsprot-api = { module = "net.rsprot:osrs-239-api", version.ref = "rsprot" }
+rsprot-shared = { module = "net.rsprot:osrs-239-shared", version.ref = "rsprot" }
 
 [bundles]
 
