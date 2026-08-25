@@ -4,6 +4,7 @@ import com.zenyte.cores.CoresManager
 import com.zenyte.game.task.WorldTasksManager
 import com.zenyte.game.GameConstants
 import com.zenyte.game.world.World
+import com.zenyte.game.world.entity.Location
 import com.zenyte.game.world.entity.player.Player
 import com.zenyte.game.world.entity.player.PlayerInformation
 import net.rsprot.crypto.xtea.XteaKey
@@ -66,7 +67,7 @@ class ZenyteConnectionHandler(
 
         // Extract password from auth block
         val password = when (val auth = block.authentication) {
-            is AuthenticationType.PasswordAuthentication -> auth.password.toString()
+            is AuthenticationType.PasswordAuthentication -> auth.password.asString()
             is AuthenticationType.TokenAuthentication -> {
                 logger.warn("Token authentication not supported, rejecting: {}", username)
                 responseHandler.writeFailedResponse(LoginResponse.InvalidLoginPacket)
@@ -164,13 +165,33 @@ class ZenyteConnectionHandler(
         player.session = rspClient
 
         player.createLogger()
+
+        // The client loads the real OSRS cache. If the save (or REGISTRATION_LOCATION) is in an
+        // NR-custom region there is no map data for it and the client hangs on "Loading - please
+        // wait". Drop the player somewhere real before building the login rebuild.
+        val loginRegion = player.location.regionId
+        if (!ZenyteJs5GroupProvider.hasMapSquare(loginRegion)) {
+            logger.warn(
+                "Player '{}' is at {} (region {}) which the client cache lacks — relocating to {}",
+                player.username, player.location, loginRegion, SAFE_LOGIN_LOCATION,
+            )
+            player.setLocation(Location(SAFE_LOGIN_LOCATION))
+        }
+
         player.loadMapRegions(true)
         player.afterLoadMapRegions()
+        // RSProt login rebuild: coords + build area into the avatar, then RebuildLoginV2.
+        rspClient.rebuildLogin(player)
         player.isInitialized = true
 
         player.onLogin()
 
         logger.info("Player '{}' logged in via RSProt (index={})", player.username, player.index)
+    }
+
+    private companion object {
+        /** Lumbridge castle courtyard — exists in every OSRS cache. */
+        val SAFE_LOGIN_LOCATION = Location(3222, 3218, 0)
     }
 
     override fun onReconnect(
