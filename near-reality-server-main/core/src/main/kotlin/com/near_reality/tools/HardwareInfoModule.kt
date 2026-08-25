@@ -67,7 +67,7 @@ object HardwareInfoModule {
     @JvmStatic
     fun onPlayerLogin(loginEvent: LoginEvent) {
         val player = loginEvent.player
-        val hardwareInfo = player.playerInformation.hardware
+        val hardwareInfo = player.playerInformation.hardware ?: return
         val hardwareInfoForPlayer =
             hardwareInfoByPlayer.getOrPut(player.username) { mutableSetOf() }
         if (hardwareInfoForPlayer.add(hardwareInfo))
