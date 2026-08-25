@@ -25,6 +25,7 @@ import net.rsprot.protocol.game.outgoing.map.RebuildLoginV2
 import net.rsprot.protocol.game.outgoing.map.RebuildNormalV2
 import net.rsprot.protocol.game.outgoing.map.RebuildRegionV2
 import net.rsprot.protocol.game.outgoing.map.util.RebuildRegionZone
+import net.rsprot.protocol.game.outgoing.zone.header.UpdateZoneFullFollows
 import net.rsprot.protocol.game.outgoing.zone.header.UpdateZonePartialEnclosed
 import net.rsprot.protocol.message.OutgoingGameMessage
 import net.rsprot.protocol.message.ZoneProt
@@ -121,6 +122,17 @@ class ZenyteRspClient(
     }
 
     fun clearZones() = zoneQueue.clear()
+
+    /**
+     * Zone header that wipes a zone and sets the client's current-zone pointer, so the
+     * payloads that follow apply to it. Queued directly on the session rather than through
+     * [zoneQueue] — it is a header, not an enclosed payload. Callers pass build-area-relative
+     * tile coordinates of the zone's south-western corner.
+     */
+    fun queueZoneFullFollows(deltaTileX: Int, deltaTileY: Int, level: Int) {
+        if (deltaTileX < 0 || deltaTileX > 96 || deltaTileY < 0 || deltaTileY > 96) return
+        rspSession.queue(UpdateZoneFullFollows(deltaTileX, deltaTileY, level))
+    }
 
     /**
      * Emits every pending zone payload. Zone headers are relative to the build-area
