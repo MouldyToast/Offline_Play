@@ -1,6 +1,8 @@
 package com.zenyte.game.packet.out;
 
 import com.zenyte.game.packet.GamePacketEncoder;
+import com.zenyte.game.packet.ZoneProtConvertible;
+import com.zenyte.game.packet.ZoneProts;
 import com.zenyte.game.world.entity.player.LogLevel;
 import com.zenyte.game.world.entity.player.Player;
 import com.zenyte.game.world.object.WorldObject;
@@ -12,7 +14,12 @@ import org.jetbrains.annotations.NotNull;
  * @author Tommeh | 28 jul. 2018 | 18:29:57
  * @see <a href="https://www.rune-server.ee/members/tommeh/">Rune-Server profile</a>}
  */
-public final class LocDel implements GamePacketEncoder {
+public final class LocDel implements GamePacketEncoder, ZoneProtConvertible {
+
+    @Override
+    public net.rsprot.protocol.message.ZoneProt toZoneProt(@NotNull final Player player) {
+        return ZoneProts.locDel(object);
+    }
     private final WorldObject object;
 
     @Override
