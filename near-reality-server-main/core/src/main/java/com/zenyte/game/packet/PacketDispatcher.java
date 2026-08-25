@@ -56,7 +56,7 @@ import net.rsprot.protocol.game.outgoing.misc.client.MinimapToggle;
 import net.rsprot.protocol.game.outgoing.misc.client.UrlOpen;
 import net.rsprot.protocol.game.outgoing.misc.player.MessageGame;
 import net.rsprot.protocol.game.outgoing.misc.player.RunClientScript;
-import net.rsprot.protocol.game.outgoing.misc.player.SetMapFlagV1;
+import net.rsprot.protocol.game.outgoing.misc.player.SetMapFlagV2;
 import net.rsprot.protocol.game.outgoing.misc.player.SetPlayerOp;
 import net.rsprot.protocol.game.outgoing.misc.player.UpdateRunEnergy;
 import net.rsprot.protocol.game.outgoing.misc.player.UpdateRunWeight;
@@ -472,12 +472,16 @@ public class PacketDispatcher {
 	}
 
 	public void sendMapFlag(final int x, final int y) {
-		// Callers pass build-area-local coords (Player.getXInScene / getYInScene); 255,255 clears the flag.
-		queue(new SetMapFlagV1(x & 0xFF, y & 0xFF));
+		// Callers pass build-area-local coords (Player.getXInScene / getYInScene).
+		// V2 requires absolute world coords, so convert using the player's scene base.
+		final int baseChunkId = player.getSceneBaseChunkId();
+		final int baseX = (baseChunkId & 2047) << 3;
+		final int baseZ = ((baseChunkId >> 11) & 2047) << 3;
+		queue(new SetMapFlagV2(x + baseX, y + baseZ));
 	}
 
 	public void resetMapFlag() {
-		sendMapFlag(255, 255);
+		queue(new SetMapFlagV2());
 	}
 
 	// ------------------------------------------------------------------
