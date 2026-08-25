@@ -186,6 +186,22 @@ class ZenyteConnectionHandler(
 
         player.onLogin()
 
+        // NR's lobby normally calls sendGameFrame() to open the top-level interface (IfOpenTop)
+        // and all game-frame sub-interfaces (tabs, chatbox, minimap, etc.). RSProt bypasses the
+        // lobby entirely, and WindowStatusEvent.handle() early-returns when the mode already
+        // matches the PlayerInformation mode — so sendGameFrame() is never triggered. Without
+        // IfOpenTop the client has no game frame and stays on "Loading - please wait" forever.
+        player.interfaceHandler.sendGameFrame()
+
+        // RSProt's Session.flush() no-ops until LOGIN_TRANSITION_COMPLETE is set internally.
+        // writeSuccessfulResponse() submitted a task to the Netty event loop that sets that flag,
+        // but it hasn't run yet (we're on the World Thread). Schedule a flush on the same event
+        // loop — FIFO ordering guarantees it runs after the transition task, so the gate is open
+        // and this flush actually writes the login burst to the wire.
+        session.ctx.channel().eventLoop().execute {
+            rspClient.flush()
+        }
+
         logger.info("Player '{}' logged in via RSProt (index={})", player.username, player.index)
     }
 
