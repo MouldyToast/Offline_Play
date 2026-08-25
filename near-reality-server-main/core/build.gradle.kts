@@ -25,6 +25,10 @@ dependencies {
     api(libs.javaparser.core)
     api(libs.javaparser.symbol.solver.core)
 
+    // RSProt 240 networking
+    api(libs.rsprot.api)
+    api(libs.rsprot.shared)
+
     implementation(libs.apache.commons.lang3)
     implementation(libs.apache.commons.codec)
     implementation(libs.jctools.core)
