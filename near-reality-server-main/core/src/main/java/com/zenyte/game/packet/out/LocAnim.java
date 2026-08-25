@@ -1,6 +1,8 @@
 package com.zenyte.game.packet.out;
 
 import com.zenyte.game.packet.GamePacketEncoder;
+import com.zenyte.game.packet.ZoneProtConvertible;
+import com.zenyte.game.packet.ZoneProts;
 import com.zenyte.game.world.entity.Location;
 import com.zenyte.game.world.entity.masks.Animation;
 import com.zenyte.game.world.entity.player.LogLevel;
@@ -14,7 +16,12 @@ import org.jetbrains.annotations.NotNull;
  * @author Tommeh | 28 jul. 2018 | 18:28:56
  * @see <a href="https://www.rune-server.ee/members/tommeh/">Rune-Server profile</a>}
  */
-public final class LocAnim implements GamePacketEncoder {
+public final class LocAnim implements GamePacketEncoder, ZoneProtConvertible {
+
+	@Override
+	public net.rsprot.protocol.message.ZoneProt toZoneProt(@NotNull final Player player) {
+		return ZoneProts.locAnim(animation.getId(), x, y, type, rotation);
+	}
 	private final int id;
 	private final int type;
 	private final int rotation;
