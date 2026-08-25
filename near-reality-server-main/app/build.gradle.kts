@@ -204,6 +204,10 @@ val runPluginScanner = execTask("runPluginScanner", "_nr_data") {
 }
 
 execTask("runDev", "_nr_dev") {
+    jvmArgs(
+        "-Dnet.rsprot.protocol.internal.js5Logging=debug",
+        "-Dnet.rsprot.protocol.internal.networkLogging=debug",
+    )
     args = listOf("localhost")
 //    tryEnableSignozLogging("game-dev")
 }
