@@ -6,6 +6,9 @@ import com.google.common.base.Stopwatch
 import com.near_reality.api.GameDatabase
 import com.near_reality.game.world.info.WorldConfig
 import com.near_reality.network.NetworkService
+import com.near_reality.network.rsprot.ZenyteConnectionHandler
+import com.near_reality.network.rsprot.ZenyteMessageConsumers
+import com.near_reality.network.rsprot.ZenyteNetworkFactory
 import com.near_reality.osrsbox_db.ItemDefinitionDatabase
 import com.near_reality.osrsbox_db.MonsterDefinitionDatabase
 import com.zenyte.cores.CoresManager
@@ -116,18 +119,18 @@ object Main {
         }
 
         val port = GameConstants.WORLD_PROFILE.port
-        logElapsed("Starting network service...") {
-            ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.DISABLED) // XXX: in production, use DISABLED
+        @OptIn(ExperimentalStdlibApi::class, ExperimentalUnsignedTypes::class)
+        logElapsed("Starting RSProt network service...") {
+            ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.DISABLED)
 
-            val networkService = NetworkService()
-            networkService.initialize()
+            val messageConsumers = ZenyteMessageConsumers()
+            lateinit var rspService: net.rsprot.protocol.api.NetworkService<com.zenyte.game.world.entity.player.Player>
+            val connectionHandler = ZenyteConnectionHandler { rspService }
 
-            networkService.listen(port)
-            networkService.listen(443)
-
-            val worldID = GameConstants.WORLD_PROFILE.number
-            networkService.listen(40000 + worldID)
-            networkService.listen(50000 + worldID)
+            val factory = ZenyteNetworkFactory(connectionHandler, messageConsumers)
+            rspService = factory.build()
+            rspService.setCommunicationThread(worldThread)
+            rspService.start()
         }
 
         val elapsed = stopwatch.elapsed(TimeUnit.MILLISECONDS)
