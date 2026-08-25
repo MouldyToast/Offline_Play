@@ -2111,7 +2111,11 @@ public class Player extends AbstractEntity implements UsernameProvider {
         if (regionUpdate) {
             loadMapRegions(false);
         }
-        send(playerViewport.cache());
+        // Skip old PlayerInfo packet when using RSProt (Session 11d replaces this
+        // with RSProt's info protocols; for now just guard against the NPE)
+        if (!(session instanceof com.near_reality.network.rsprot.ZenyteRspClient)) {
+            send(playerViewport.cache());
+        }
         if (!pendingVars.isEmpty()) {
             IntIterator it = pendingVars.intIterator();
             while (it.hasNext()) {
@@ -2150,7 +2154,9 @@ public class Player extends AbstractEntity implements UsernameProvider {
             }
             zoneFollowPackets.clear();
         }
-        send(npcViewport.cache());
+        if (!(session instanceof com.near_reality.network.rsprot.ZenyteRspClient)) {
+            send(npcViewport.cache());
+        }
         if (regionUpdate) {
             setNeedRegionUpdate(false);
         }
