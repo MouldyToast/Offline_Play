@@ -390,18 +390,53 @@ public final class WorldThread extends MainThread {
     private void processPlayerEntityUpdate() {
         try {
             final boolean postEvents = hooks.hasListenersFor(PlayerEvent.Update.class);
+
+            // RSProt step 1: push every player's coords/appearance into their avatar.
             for (final Player player : World.usedPIDs.values()) {
                 try {
                     if (skipPlayer(player)) continue;
+                    if (player.getSession() instanceof com.near_reality.network.rsprot.ZenyteRspClient) {
+                        ((com.near_reality.network.rsprot.ZenyteRspClient) player.getSession()).preUpdate(player);
+                    }
+                } catch (final Throwable e) {
+                    log.error("Failed RSProt pre-update for player {}", player, e);
+                }
+            }
+
+            // RSProt step 2: compute PlayerInfo / NpcInfo / WorldEntityInfo for all players at once.
+            try {
+                com.near_reality.network.rsprot.RspService.updateInfoProtocols();
+            } catch (final Throwable e) {
+                log.error("Failed RSProt info protocol update", e);
+            }
+
+            // RSProt step 3: per-player queue + flush.
+            for (final Player player : World.usedPIDs.values()) {
+                try {
+                    if (skipPlayer(player)) {
+                        // Still holding computed info buffers for this slot — release, don't leak.
+                        if (player != null && !player.isFinished()
+                                && player.getSession() instanceof com.near_reality.network.rsprot.ZenyteRspClient) {
+                            ((com.near_reality.network.rsprot.ZenyteRspClient) player.getSession()).releaseInfo();
+                        }
+                        continue;
+                    }
 
                     if (postEvents) {
                         hooks.post(new PlayerEvent.Update(player));
                     }
                     player.processEntityUpdate();
+                    if (player.getSession() instanceof com.near_reality.network.rsprot.ZenyteRspClient) {
+                        player.getSession().flush();
+                    }
                 } catch (final Throwable e) {
                     log.error("Failed to perform entity update for player {}", player, e);
                 }
             }
+
+            // Free this tick's UpdateZonePartialEnclosed payload buffers — every player that used
+            // them has now flushed. Must run once per tick after the loop.
+            com.near_reality.network.rsprot.ZenyteRspClient.releaseTick();
         } catch (final Throwable e) {
             log.error("Failed to perform entity update for players", e);
         }
