@@ -307,7 +307,7 @@ public final class Appearance {
 		return beardIcon;
 	}
 
-	private int getId(final int slot) {
+	public int getId(final int slot) {
 		if (!forcedAppearance.isEmpty() && forcedAppearance.containsKey((byte) slot)) {
 			return forcedAppearance.get((byte) slot);
 		}
