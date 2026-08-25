@@ -3,6 +3,7 @@ package com.near_reality.network.rsprot
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
+import mgi.tools.jagcached.cache.Archive
 import mgi.tools.jagcached.cache.Cache
 import net.rsprot.protocol.api.js5.Js5GroupProvider
 import org.slf4j.LoggerFactory
@@ -29,8 +30,12 @@ class ZenyteJs5GroupProvider : Js5GroupProvider {
     private val logger = LoggerFactory.getLogger(ZenyteJs5GroupProvider::class.java)
     private val groups = Int2ObjectOpenHashMap<ByteBuf>(131_072)
 
+    /** Archive 5 of the client cache — used to answer [hasMapSquare]. */
+    private var mapsArchive: Archive? = null
+
     init {
         load()
+        instance = this
     }
 
     override fun provide(archive: Int, group: Int): ByteBuf? {
@@ -43,14 +48,23 @@ class ZenyteJs5GroupProvider : Js5GroupProvider {
 
         val cache = Cache.openCache(path, true)
         val archiveCount = cache.archiveCount
+        mapsArchive = cache.getArchive(ARCHIVE_MAPS)
 
         // Encode regular groups for each archive that exists
         for (archiveId in 0 until archiveCount) {
             val index = cache.getIndex(archiveId) ?: continue
             val archive = cache.getArchive(archiveId) ?: continue
+            var highestGroup = -1
             for (groupId in 0..index.groupCount()) {
                 val rawData = index.get(groupId)?.buffer ?: continue
                 groups[bitpack(archiveId, groupId)] = encodeGroup(archiveId, groupId, rawData)
+                highestGroup = groupId
+            }
+            // The client sizes its interface / clientscript tables from these archives.
+            // PacketDispatcher uses the counts to skip NR-custom ids the client cannot load.
+            when (archiveId) {
+                ARCHIVE_INTERFACES -> clientInterfaceCount = highestGroup + 1
+                ARCHIVE_CLIENTSCRIPTS -> clientScriptCount = highestGroup + 1
             }
         }
 
@@ -72,11 +86,45 @@ class ZenyteJs5GroupProvider : Js5GroupProvider {
             groups[bitpack(255, 255)] = Unpooled.unreleasableBuffer(masterBuf)
         }
 
-        logger.info("Loaded {} JS5 responses from real OSRS cache ({} archives)", groups.size, archiveCount)
+        logger.info("Loaded {} JS5 responses from real OSRS cache ({} archives, {} interfaces, {} clientscripts)",
+            groups.size, archiveCount, clientInterfaceCount, clientScriptCount)
     }
 
     companion object {
         private const val OSRS_CACHE_PATH = "cache/data/cache-239/cache"
+
+        private const val ARCHIVE_INTERFACES = 3
+        private const val ARCHIVE_MAPS = 5
+        private const val ARCHIVE_CLIENTSCRIPTS = 12
+
+        @Volatile
+        private var instance: ZenyteJs5GroupProvider? = null
+
+        /**
+         * True if the cache the CLIENT loads contains terrain for [regionId]
+         * (`m{x}_{y}` in archive 5). Fail-open when the provider isn't loaded yet.
+         * NR-custom regions (instance space, custom home) return false — the client
+         * would hang on "Loading - please wait" if sent there.
+         */
+        @JvmStatic
+        fun hasMapSquare(regionId: Int): Boolean {
+            val archive = instance?.mapsArchive ?: return true
+            val x = regionId shr 8
+            val y = regionId and 0xFF
+            return archive.findGroupByName("m${x}_$y") != null
+        }
+
+        /** Number of interfaces in the cache the CLIENT loads (0 = unknown). */
+        @JvmStatic
+        @Volatile
+        var clientInterfaceCount: Int = 0
+            private set
+
+        /** Number of clientscripts in the cache the CLIENT loads (0 = unknown). */
+        @JvmStatic
+        @Volatile
+        var clientScriptCount: Int = 0
+            private set
 
         // Rev-239: 8-byte header [archive:1][group:2][compression:1][compressedSize:4]
         private const val HEADER_SIZE = 8
