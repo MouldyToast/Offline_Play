@@ -1,6 +1,8 @@
 package com.zenyte.game.packet.out;
 
 import com.zenyte.game.packet.GamePacketEncoder;
+import com.zenyte.game.packet.ZoneProtConvertible;
+import com.zenyte.game.packet.ZoneProts;
 import com.zenyte.game.world.entity.Location;
 import com.zenyte.game.world.entity.player.LogLevel;
 import com.zenyte.game.world.entity.player.Player;
@@ -16,7 +18,12 @@ import org.jetbrains.annotations.NotNull;
  * @see <a href="https://rune-status.net/members/kris.354/">Rune-Status
  *      profile</a>}
  */
-public final class ObjUpdate implements GamePacketEncoder {
+public final class ObjUpdate implements GamePacketEncoder, ZoneProtConvertible {
+
+	@Override
+	public net.rsprot.protocol.message.ZoneProt toZoneProt(@NotNull final Player player) {
+		return ZoneProts.objCount(floorItem, oldQuantity);
+	}
 	private final FloorItem floorItem;
 	private final int oldQuantity;
 
