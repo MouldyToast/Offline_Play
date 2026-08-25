@@ -1,6 +1,8 @@
 package com.zenyte.game.packet.out;
 
 import com.zenyte.game.packet.GamePacketEncoder;
+import com.zenyte.game.packet.ZoneProtConvertible;
+import com.zenyte.game.packet.ZoneProts;
 import com.zenyte.game.world.entity.Location;
 import com.zenyte.game.world.entity.SoundEffect;
 import com.zenyte.game.world.entity.player.LogLevel;
@@ -14,7 +16,12 @@ import org.jetbrains.annotations.NotNull;
  * @see <a href="https://www.rune-server.ee/members/kris/">Rune-Server profile</a>}
  * @see <a href="https://rune-status.net/members/kris.354/">Rune-Status profile</a>}
  */
-public final class AreaSound implements GamePacketEncoder {
+public final class AreaSound implements GamePacketEncoder, ZoneProtConvertible {
+
+    @Override
+    public net.rsprot.protocol.message.ZoneProt toZoneProt(@NotNull final Player player) {
+        return ZoneProts.soundArea(tile, sound);
+    }
     private final Player player;
     private final Location tile;
     private final SoundEffect sound;
