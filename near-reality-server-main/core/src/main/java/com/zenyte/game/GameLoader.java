@@ -33,7 +33,7 @@ public final class GameLoader {
         ZenyteHuffman.load(cache);
         JS5Responses.preload(cache);
 
-        ClientProtLoader.load();
+        // ClientProtLoader.load(); // Replaced by RSProt message consumers (ZenyteMessageConsumers)
         CacheManager.loadDefinitions(pool, false);
     }
 }
