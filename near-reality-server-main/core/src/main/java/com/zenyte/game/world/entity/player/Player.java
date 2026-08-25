@@ -2037,6 +2037,18 @@ public class Player extends AbstractEntity implements UsernameProvider {
         pendingVars.clear();
         zoneFollowPackets.clear();
         tempList.clear();
+        if (session instanceof com.near_reality.network.rsprot.ZenyteRspClient) {
+            final com.near_reality.network.rsprot.ZenyteRspClient rsp =
+                    (com.near_reality.network.rsprot.ZenyteRspClient) session;
+            rsp.clearZones();
+            if (com.near_reality.network.rsprot.RspService.isReady()) {
+                try {
+                    rsp.unregister(com.near_reality.network.rsprot.RspService.getService());
+                } catch (final Throwable e) {
+                    log.warn("Failed to dealloc RSProt infos for {}", getUsername(), e);
+                }
+            }
+        }
         chunksInScope.clear();
         receivedHits.clear();
         nextHits.clear();
@@ -2111,9 +2123,11 @@ public class Player extends AbstractEntity implements UsernameProvider {
         if (regionUpdate) {
             loadMapRegions(false);
         }
-        // Skip old PlayerInfo packet when using RSProt (Session 11d replaces this
-        // with RSProt's info protocols; for now just guard against the NPE)
-        if (!(session instanceof com.near_reality.network.rsprot.ZenyteRspClient)) {
+        if (session instanceof com.near_reality.network.rsprot.ZenyteRspClient) {
+            // Queues SetActiveWorld, NpcUpdateOrigin, WorldEntityInfo, PlayerInfo, NpcInfo (computed
+            // earlier this tick by RspService.updateInfoProtocols()).
+            ((com.near_reality.network.rsprot.ZenyteRspClient) session).flushInfo();
+        } else {
             send(playerViewport.cache());
         }
         if (!pendingVars.isEmpty()) {
@@ -2127,6 +2141,9 @@ public class Player extends AbstractEntity implements UsernameProvider {
         if (teleported) {
             if (lastLocation != null && getPlane() != lastLocation.getPlane()) {
                 zoneFollowPackets.clear();
+                if (session instanceof com.near_reality.network.rsprot.ZenyteRspClient) {
+                    ((com.near_reality.network.rsprot.ZenyteRspClient) session).clearZones();
+                }
             }
             updateScopeInScene();
         }
@@ -2136,21 +2153,18 @@ public class Player extends AbstractEntity implements UsernameProvider {
             }
             tempList.clear();
         }
-        if (!zoneFollowPackets.isEmpty()) {
+        if (session instanceof com.near_reality.network.rsprot.ZenyteRspClient) {
+            ((com.near_reality.network.rsprot.ZenyteRspClient) session).flushZones(this);
+        } else if (!zoneFollowPackets.isEmpty()) {
             for (Int2ObjectMap.Entry<List<GamePacketEncoder>> entry : zoneFollowPackets.int2ObjectEntrySet()) {
                 final int key = entry.getIntKey();
                 final java.util.List<GamePacketEncoder> packets = entry.getValue();
-//                if (packets.size() == 1) {
-//                    send(new UpdateZonePartialFollows((key & 2047) << 3, (key >> 11 & 2047) << 3, this));
-//                    send(packets.get(0));
-//                } else {
-                    final UpdateZonePartialEnclosed zonePacket = new UpdateZonePartialEnclosed((key & 2047) << 3,
-                            (key >> 11 & 2047) << 3, this);
-                    for (int i = packets.size() - 1; i >= 0; i--) {
-                        zonePacket.append(packets.get(i));
-                    }
-                    send(zonePacket);
-                //}
+                final UpdateZonePartialEnclosed zonePacket = new UpdateZonePartialEnclosed((key & 2047) << 3,
+                        (key >> 11 & 2047) << 3, this);
+                for (int i = packets.size() - 1; i >= 0; i--) {
+                    zonePacket.append(packets.get(i));
+                }
+                send(zonePacket);
             }
             zoneFollowPackets.clear();
         }
@@ -2210,6 +2224,17 @@ public class Player extends AbstractEntity implements UsernameProvider {
     }
 
     public void sendZoneUpdate(final int tileX, final int tileY, final GamePacketEncoder packet) {
+        if (session instanceof com.near_reality.network.rsprot.ZenyteRspClient) {
+            // Legacy encoder from a game-logic call site (LocAdd/LocDel/LocAnim/ObjAdd/...).
+            if (packet instanceof com.zenyte.game.packet.ZoneProtConvertible) {
+                final net.rsprot.protocol.message.ZoneProt prot =
+                        ((com.zenyte.game.packet.ZoneProtConvertible) packet).toZoneProt(this);
+                if (prot != null) {
+                    sendZoneUpdate(tileX, tileY, prot);
+                }
+            }
+            return;
+        }
         final int chunkX = tileX >> 3;
         final int chunkY = tileY >> 3;
         final int hash = chunkX | chunkY << 11;
@@ -2219,6 +2244,13 @@ public class Player extends AbstractEntity implements UsernameProvider {
             zoneFollowPackets.put(hash, list);
         }
         list.add(packet);
+    }
+
+    /** RSProt-native zone update. Queued per chunk, flushed by ZenyteRspClient.flushZones. */
+    public void sendZoneUpdate(final int tileX, final int tileY, final net.rsprot.protocol.message.ZoneProt prot) {
+        if (session instanceof com.near_reality.network.rsprot.ZenyteRspClient) {
+            ((com.near_reality.network.rsprot.ZenyteRspClient) session).queueZone(tileX, tileY, prot);
+        }
     }
 
     /**
