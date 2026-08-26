@@ -4,7 +4,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.annotations.Expose;
-import com.near_reality.api.resources.Vote;
+import com.near_reality.network.rsprot.ZenyteJs5GroupProvider;
 import com.near_reality.game.model.ui.chat_channel.ChatChannelPlayerExtKt;
 import com.zenyte.game.GameInterface;
 import com.zenyte.game.model.ui.testinterfaces.advancedsettings.SettingVariables;
@@ -267,7 +267,12 @@ public class InterfaceHandler {
 
 	public void sendInterface(final InterfacePosition position, final int id, final boolean walkable) {
 		if (!ComponentDefinitions.containsInterface(id)) {
-			return;
+			// Server's merged cache doesn't have this interface, but the client
+			// runs rev 239 served via JS5. Let it through if the client has it.
+			final int clientCount = ZenyteJs5GroupProvider.getClientInterfaceCount();
+			if (clientCount <= 0 || id >= clientCount) {
+				return;
+			}
 		}
 		if (position.equals(InterfacePosition.DIALOGUE)) {
 			closeInterface(InterfacePosition.CENTRAL);
