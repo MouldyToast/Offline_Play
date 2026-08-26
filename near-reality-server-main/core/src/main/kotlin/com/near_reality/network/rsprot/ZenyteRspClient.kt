@@ -68,6 +68,9 @@ class ZenyteRspClient(
 
     private var appearanceSynced = false
 
+    /** Cached face-entity so we only push the mask when it actually changes. */
+    private var knownFaceEntity: Int = -1
+
     private val extendedInfo: PlayerAvatarExtendedInfo
         get() = infos.playerInfo.avatar.extendedInfo
 
@@ -233,11 +236,159 @@ class ZenyteRspClient(
      */
     fun preUpdate(player: Player) {
         infos.updateRootCoord(player.plane, player.x, player.y)
-        if (!appearanceSynced || player.updateFlags.get(UpdateFlag.APPEARANCE)) {
+
+        val flags = player.updateFlags
+
+        // -- Appearance --
+        if (!appearanceSynced || flags.get(UpdateFlag.APPEARANCE)) {
             syncAppearance(player)
             appearanceSynced = true
         }
-        // Session 11d: animation, spotanim, chat, face-entity, hits, force-movement masks go here.
+
+        // -- Temporary movement type (teleport / walk / run for this tick) --
+        if (flags.get(UpdateFlag.TEMPORARY_MOVEMENT_TYPE)) {
+            val speed = when {
+                player.isTeleported -> 127   // instant / teleport
+                player.isRun       -> 2     // run
+                else               -> 1     // walk
+            }
+            extendedInfo.setTempMoveSpeed(speed)
+        }
+
+        // -- Movement type (cached walk/run toggle) --
+        if (flags.get(UpdateFlag.MOVEMENT_TYPE)) {
+            extendedInfo.setMoveSpeed(if (player.isRun) 2 else 1)
+        }
+
+        // -- Animation --
+        if (flags.get(UpdateFlag.ANIMATION)) {
+            val anim = player.animation
+            if (anim != null) {
+                extendedInfo.setSequence(anim.id, anim.delay)
+            } else {
+                extendedInfo.setSequence(-1, 0)
+            }
+        }
+
+        // -- Graphics / spot anim --
+        if (flags.get(UpdateFlag.GRAPHICS)) {
+            val gfx = player.graphics
+            if (gfx != null) {
+                extendedInfo.setSpotAnim(0, gfx.id, gfx.delay, gfx.height)
+            }
+        }
+
+        // -- Face entity --
+        // RSProt splits NPC vs player targets into separate methods.
+        // NR faceEntity: -1 = none, 0..32767 = NPC index, 32768+ = player index + 32768.
+        if (flags.get(UpdateFlag.FACE_ENTITY) || knownFaceEntity != player.faceEntity) {
+            val fe = player.faceEntity
+            when {
+                fe == -1  -> extendedInfo.resetFacing()
+                fe < 32768 -> extendedInfo.setFaceNpc(fe, false, 0, 0)
+                else       -> extendedInfo.setFacePlayer(fe - 32768, false, 0, 0)
+            }
+            knownFaceEntity = fe
+        }
+
+        // -- Face coordinate --
+        // NR computes `direction` (0-2047) alongside `faceLocation`. The old mask writes
+        // `getDirection()` for players, which is the face angle. Pass it straight through.
+        if (flags.get(UpdateFlag.FACE_COORDINATE)) {
+            extendedInfo.setFaceAngle(player.direction)
+        }
+
+        // -- Forced chat (overhead text from game logic, e.g. "Taste vengeance!") --
+        if (flags.get(UpdateFlag.FORCED_CHAT)) {
+            val ft = player.forceTalk
+            if (ft != null) {
+                extendedInfo.setSay(ft.text)
+            }
+        }
+
+        // -- Public chat message --
+        // NR packs colour + effect into a single short: ((colour & 0xFF) << 8) | (effect & 0xFF).
+        // RSProt wants them separated. NR has no `pattern` field; pass null.
+        if (flags.get(UpdateFlag.CHAT)) {
+            val msg = player.chatMessage
+            if (msg != null) {
+                val packed = msg.effects
+                val colour = (packed shr 8) and 0xFF
+                val effect = packed and 0xFF
+                extendedInfo.setChat(
+                    colour,
+                    effect,
+                    player.rankIcon,
+                    msg.isAutotyper,
+                    msg.chatText,
+                    null,
+                )
+            }
+        }
+
+        // -- Hits + headbars --
+        // NR's old protocol has no sourceIndex; RSProt supports it for modern OSRS. Pass -1.
+        // HitType.getId() = what the source sees, getDynamicId() = what others see.
+        if (flags.get(UpdateFlag.HIT)) {
+            for (hit in player.nextHits) {
+                val splat = hit.appliedSplat
+                extendedInfo.addHitMark(
+                    /* sourceIndex */  -1,
+                    /* selfType */     splat.id,
+                    /* sourceType */   splat.id,
+                    /* otherType */    splat.dynamicId,
+                    /* value */        hit.damage,
+                    /* delay */        hit.delay,
+                )
+            }
+            for (bar in player.hitBars) {
+                extendedInfo.addHeadBar(
+                    /* sourceIndex */  -1,
+                    /* selfType */     bar.type,
+                    /* otherType */    bar.type,
+                    /* startFill */    bar.percentage,
+                    /* endFill */      bar.interpolatePercentage(),
+                    /* startTime */    0,
+                    /* endTime */      bar.interpolateTime(),
+                )
+            }
+        }
+
+        // -- Force movement (exact move) --
+        // ForceMovement stores delays in client cycles (30ms units). RSProt expects the same.
+        if (flags.get(UpdateFlag.FORCE_MOVEMENT)) {
+            val fm = player.forceMovement
+            if (fm != null) {
+                val first = fm.toFirstTile
+                val second = fm.toSecondTile
+                val px = player.x
+                val py = player.y
+                extendedInfo.setExactMove(
+                    /* deltaX1 */ if (first != null) first.x - px else 0,
+                    /* deltaZ1 */ if (first != null) first.y - py else 0,
+                    /* delay1 */  fm.firstTileTicketDelay,
+                    /* deltaX2 */ if (second != null) second.x - px else 0,
+                    /* deltaZ2 */ if (second != null) second.y - py else 0,
+                    /* delay2 */  fm.secondTileTicketDelay,
+                    /* angle */   fm.direction,
+                )
+            }
+        }
+
+        // -- Tinting --
+        if (flags.get(UpdateFlag.TINTING)) {
+            val tint = player.tinting
+            if (tint != null) {
+                extendedInfo.setTinting(
+                    tint.delay,
+                    tint.duration,
+                    tint.hue,
+                    tint.saturation,
+                    tint.luminance,
+                    tint.opacity,
+                )
+            }
+        }
     }
 
     /**
