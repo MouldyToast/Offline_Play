@@ -37,13 +37,13 @@ public class OrbsInterface extends Interface {
 
     @Override
     protected void attach() {
-        put(5, "Experience Tracker");
-        put(8, "Cure Toxins");
-        put(19, "Prayer");
-        put(27, "Run");
-        put(35, "Toggle special");
-        put(45, "Open Store");
-        put(53, "View World Map");
+        put(6, "Experience Tracker");   // rev239: orbs:xp_drops (was 5)
+        put(9, "Cure Toxins");          // rev239: orbs:healthbutton (was 8)
+        put(20, "Prayer");              // rev239: orbs:prayerbutton (was 19)
+        put(28, "Run");                 // rev239: orbs:runbutton (was 27)
+        put(36, "Toggle special");      // rev239: orbs:specbutton (was 35)
+        put(46, "Open Store");          // rev239: orbs:store_button (was 45)
+        put(55, "View World Map");      // rev239: orbs:worldmap (was 53)
     }
 
     @Override
