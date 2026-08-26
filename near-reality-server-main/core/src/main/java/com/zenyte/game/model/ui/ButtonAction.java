@@ -29,8 +29,12 @@ public enum ButtonAction {
         final boolean isDebugEnabled = logger.isDebugEnabled();
         player.getInterfaceHandler().closeInput(true);
         final ComponentDefinitions defs = ComponentDefinitions.get(interfaceId, componentId);
-        final String op = defs.getActions() == null || defs.getActions().length <= (option - 1) ? "null" :
-                defs.getActions()[option - 1];
+        final String op;
+        if (defs == null || defs.getActions() == null || defs.getActions().length <= (option - 1)) {
+            op = "null";
+        } else {
+            op = defs.getActions()[option - 1];
+        }
         /*
          * Temporarily
          */
