@@ -179,7 +179,13 @@ public class InterfaceHandler {
 		sendInterface(378, 27, PaneType.FULL_SCREEN, false);
 		dispatcher.sendClientScript(1080, "");
 		sendInterface(InterfacePosition.SKILLS_TAB, 320);
-		dispatcher.sendComponentSettings(399, 7, 0, EnumDefinitions.get(1374).getSize(), AccessMask.CLICK_OP1);
+		// Rev 239: enum 1374 (free quests) is empty — quest tab restructured.
+		// Enum 1375 = 41 entries (quest sort orders), enum 1376 = 3 entries (miniquests).
+		// The questlist_init client script populates the list from cache data.
+		final int enum1374Size = EnumDefinitions.get(1374).getSize();
+		if (enum1374Size > 0) {
+			dispatcher.sendComponentSettings(399, 7, 0, enum1374Size, AccessMask.CLICK_OP1);
+		}
 		dispatcher.sendComponentSettings(399, 8, 0, EnumDefinitions.get(1375).getSize(), AccessMask.CLICK_OP1);
 		dispatcher.sendComponentSettings(399, 9, 0, EnumDefinitions.get(1376).getSize(), AccessMask.CLICK_OP1);
 		sendInterface(InterfacePosition.INVENTORY_TAB, 149);
@@ -210,8 +216,6 @@ public class InterfaceHandler {
 		}
 		final PacketDispatcher dispatcher = player.getPacketDispatcher();
 		dispatcher.sendComponentSettings(216, 1, 0, 47, AccessMask.CLICK_OP1);
-		dispatcher.sendComponentSettings(261, 89, 1, 4, AccessMask.CLICK_OP1);
-		dispatcher.sendComponentSettings(261, 90, 1, 4, AccessMask.CLICK_OP1);
 		player.getVarManager().sendBit(4070, player.getCombatDefinitions().getSpellbook().ordinal());
 	}
 
