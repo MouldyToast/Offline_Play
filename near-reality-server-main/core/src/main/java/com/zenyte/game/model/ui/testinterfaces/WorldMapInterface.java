@@ -26,18 +26,12 @@ public class WorldMapInterface extends Interface {
     @Override
     public void open(Player player) {
         player.getSettings().refreshSetting(Setting.WORLD_MAP_GUIDE);
-        player.getWorldMap().setVisible(true);
-        player.getWorldMap().updateLocation();
-        player.getPacketDispatcher().sendComponentSettings(getInterface(), 21, 0, 4, AccessMask.CLICK_OP1);
         player.getVarManager().sendBitInstant(SETTINGS_SEARCH_LEFT_VARBIT, 0);
         player.getVarManager().sendBitInstant(SETTINGS_SEARCH_RIGHT_VARBIT, 0);
         if (player.getWorldMap().isFullScreen()) {
-            player.getWorldMap().setPreviousPane(player.getInterfaceHandler().getPane());
-            player.getInterfaceHandler().sendPane(player.getWorldMap().getPreviousPane(), PaneType.FULL_SCREEN);
-            player.getInterfaceHandler().sendInterface(595, 38, PaneType.FULL_SCREEN, true);
-            player.getInterfaceHandler().sendInterface(594, 37, PaneType.FULL_SCREEN, false);
+            player.getWorldMap().sendFullScreenWorldMap();
         } else {
-            player.getInterfaceHandler().sendInterface(getInterface());
+            player.getWorldMap().sendFloatingWorldMap();
         }
     }
 
