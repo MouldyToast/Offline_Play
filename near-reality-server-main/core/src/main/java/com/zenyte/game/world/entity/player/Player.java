@@ -2651,7 +2651,7 @@ public class Player extends AbstractEntity implements UsernameProvider {
         if (getFaceEntity() >= 0) {
             setFaceEntity(null);
         }
-        varManager.sendBit(5983, 0);
+        varManager.sendBit(14709, 0);
         if (getTemporaryAttributes().get("CreatingRoom") != null) {
             construction.roomPreview((RoomReference) getTemporaryAttributes().get("CreatingRoom"), true);
             getTemporaryAttributes().remove("CreatingRoom");
@@ -2712,8 +2712,8 @@ public class Player extends AbstractEntity implements UsernameProvider {
 
     public void stopAllExclWorldMap() {
         setRouteEvent(null);
-        if (varManager.getBitValue(5983) != 0) {
-            varManager.sendBit(5983, 0);
+        if (varManager.getBitValue(14709) != 0) {
+            varManager.sendBit(14709, 0);
         }
         if (getTemporaryAttributes().get("CreatingRoom") != null) {
             construction.roomPreview((RoomReference) getTemporaryAttributes().get("CreatingRoom"), true);
@@ -4102,6 +4102,10 @@ public class Player extends AbstractEntity implements UsernameProvider {
             varManager.sendVar(3504, 1);
         }
         packetDispatcher.resetCamera();
+        // Initialize camera zoom bounds (CS2 script 605). These are transient varcs that reset to 0 every login.
+        // Matches the rev 239 [clientscript,login] which calls ~script605(128, 896, 128, 896).
+        // Without this, zoom bounds are all 0 and scroll wheel / camera zoom breaks entirely.
+        packetDispatcher.sendClientScript(605, 128, 896, 128, 896);
         // script for clearing pm history, synching all vars, send it tick later so server finishes transmitting varps and it synches, fixes roof and stuff
         WorldTasksManager.schedule(() -> packetDispatcher.sendClientScript(876, 0, 0, "", ""));
         //Blades by Urbi shop in Sophanem; Quest.
