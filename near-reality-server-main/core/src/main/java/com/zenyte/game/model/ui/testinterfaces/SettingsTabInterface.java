@@ -71,17 +71,18 @@ public class SettingsTabInterface extends Interface {
         bind("House options", HOUSE_OPTIONS_TAB::open);
         bind("Brightness", (player, slotId, itemId, option) -> player.getVarManager().sendVar(SettingVariables.SCREEN_BRIGHTNESS_VARP_ID, slotId * 5));
         // Rev 239: display mode uses dropdown buttons (component 40), slots 0/1/2
+        // Rev 239 dropdown child IDs are 1-indexed (child 0 is the highlight rect)
         bind("Game Client Layout Options", (player, slotId, itemId, option) -> {
-            if (slotId == 0) {
+            if (slotId == 1) {
                 if (player.getInterfaceHandler().getPane() != PaneType.FIXED) {
                     player.getInterfaceHandler().sendPane(player.getInterfaceHandler().getPane(), PaneType.FIXED);
                 }
-            } else if (slotId == 1) {
+            } else if (slotId == 2) {
                 if (player.getInterfaceHandler().getPane() != PaneType.RESIZABLE) {
                     player.getInterfaceHandler().sendPane(player.getInterfaceHandler().getPane(), PaneType.RESIZABLE);
                     player.getVarManager().sendBitInstant(SIDE_PANELS_VARBIT_ID, 0);
                 }
-            } else if (slotId == 2) {
+            } else if (slotId == 3) {
                 if (player.getInterfaceHandler().getPane() != PaneType.SIDE_PANELS) {
                     player.getInterfaceHandler().sendPane(player.getInterfaceHandler().getPane(), PaneType.SIDE_PANELS);
                     player.getVarManager().sendBitInstant(SIDE_PANELS_VARBIT_ID, 1);
