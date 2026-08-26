@@ -10,7 +10,7 @@ import com.zenyte.game.world.entity.player.Player;
  */
 public class SkillsTabInterface extends Interface {
 
-    private static final int[] SKILL_BUTTON_VARPS = new int[] { 0, 1, 2, 5, 3, 7, 4, 12, 22, 6, 8, 9, 10, 11, 19, 20, 23, 13, 14, 15, 16, 17, 18, 21 };
+    private static final int[] SKILL_BUTTON_VARPS = new int[] { 0, 1, 2, 5, 3, 7, 4, 12, 22, 6, 8, 9, 10, 11, 19, 20, 23, 13, 14, 15, 16, 17, 18, 21, 24 };
 
     @Override
     protected DefaultClickHandler getDefaultHandler() {
