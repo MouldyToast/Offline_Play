@@ -61,4 +61,12 @@ public enum HitType {
         buffer.writeSmart(useDynamic ? dynamicID : id);
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public int getDynamicId() {
+        return dynamicID;
+    }
+
 }
