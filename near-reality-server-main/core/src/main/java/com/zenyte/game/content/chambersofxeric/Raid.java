@@ -440,8 +440,8 @@ public final class Raid {
 
     private void refreshPoints(@NotNull final Player player) {
         final VarManager varManager = player.getVarManager();
+        varManager.sendVar(4609, getPoints(player));
         varManager.sendBit(5431, totalPoints);
-        varManager.sendBit(5422, getPoints(player));
     }
 
     private void constructMap() {
