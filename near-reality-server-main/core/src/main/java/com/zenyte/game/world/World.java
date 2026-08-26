@@ -462,10 +462,43 @@ public final class World {
             return false;
         }
         npcs.add(npc);
+        // RSProt: allocate NPC avatar so it appears in every player's NPC_INFO viewport.
+        if (com.near_reality.network.rsprot.RspService.isReady()) {
+            try {
+                final com.zenyte.game.util.Direction spawnDir = npc.getSpawnDirection();
+                final net.rsprot.protocol.game.outgoing.info.npcinfo.NpcAvatar avatar =
+                        com.near_reality.network.rsprot.RspService.getService()
+                                .getNpcAvatarFactory().alloc(
+                                        npc.getIndex(),        // slot
+                                        npc.getId(),           // NPC definition id
+                                        npc.getPlane(),        // level
+                                        npc.getX(),            // x
+                                        npc.getY(),            // z
+                                        (int) WorldThread.getCurrentCycle(), // spawnCycle
+                                        spawnDir != null ? spawnDir.getNPCDirection() : 0 // NPC direction (0-7)
+                                );
+                npc.setRspAvatar(avatar);
+            } catch (final Throwable e) {
+                log.error("Failed to allocate RSProt NPC avatar for NPC(id={}, index={})", npc.getId(), npc.getIndex(), e);
+            }
+        }
         return true;
     }
 
     public static void removeNPC(final NPC npc) {
+        // RSProt: release avatar immediately so it disappears from all viewports this tick.
+        if (com.near_reality.network.rsprot.RspService.isReady()) {
+            try {
+                final net.rsprot.protocol.game.outgoing.info.npcinfo.NpcAvatar avatar = npc.getRspAvatar();
+                if (avatar != null) {
+                    com.near_reality.network.rsprot.RspService.getService()
+                            .getNpcAvatarFactory().release(avatar);
+                    npc.setRspAvatar(null);
+                }
+            } catch (final Throwable e) {
+                log.error("Failed to release RSProt NPC avatar for NPC(id={}, index={})", npc.getId(), npc.getIndex(), e);
+            }
+        }
         pendingRemovedNPCs.add(npc);
     }
 
