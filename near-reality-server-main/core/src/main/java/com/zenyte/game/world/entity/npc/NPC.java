@@ -99,6 +99,21 @@ public class NPC extends AbstractEntity {
     }
 
     private static final Logger log = LoggerFactory.getLogger(NPC.class);
+
+    /**
+     * RSProt NPC avatar — allocated when the NPC is added to the world via
+     * {@link com.zenyte.game.world.World#addNPC}, released when removed.
+     * {@code null} when RSProt is not active or the NPC has been deallocated.
+     */
+    private transient net.rsprot.protocol.game.outgoing.info.npcinfo.NpcAvatar rspAvatar;
+
+    public net.rsprot.protocol.game.outgoing.info.npcinfo.NpcAvatar getRspAvatar() {
+        return rspAvatar;
+    }
+
+    public void setRspAvatar(final net.rsprot.protocol.game.outgoing.info.npcinfo.NpcAvatar avatar) {
+        this.rspAvatar = avatar;
+    }
     public static final IntOpenHashSet pendingAggressionCheckNPCs = new IntOpenHashSet();
     protected final Object2LongMap<Entity> interactingEntities = new Object2LongOpenHashMap<>();
     protected final transient Int2ObjectOpenHashMap<NPCCombatDefinitions> combatDefinitionsMap = new Int2ObjectOpenHashMap<>(1);
