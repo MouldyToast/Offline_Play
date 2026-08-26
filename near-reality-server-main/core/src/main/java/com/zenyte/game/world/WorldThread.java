@@ -426,8 +426,9 @@ public final class WorldThread extends MainThread {
                         hooks.post(new PlayerEvent.Update(player));
                     }
                     player.processEntityUpdate();
-                    if (player.getSession() instanceof com.near_reality.network.rsprot.ZenyteRspClient) {
-                        player.getSession().flush();
+                    if (player.getSession() instanceof com.near_reality.network.rsprot.ZenyteRspClient rspClient) {
+                        rspClient.writeServerTickEnd();
+                        rspClient.flush();
                     }
                 } catch (final Throwable e) {
                     log.error("Failed to perform entity update for player {}", player, e);
