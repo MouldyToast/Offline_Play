@@ -403,6 +403,36 @@ public final class WorldThread extends MainThread {
                 }
             }
 
+            // RSProt step 1b: sync every NPC's position + extended info into its RSProt avatar.
+            if (com.near_reality.network.rsprot.RspService.isReady()) {
+                for (final com.zenyte.game.world.entity.npc.NPC npc : World.getNPCs()) {
+                    try {
+                        if (npc == null || npc.isFinished()) continue;
+                        net.rsprot.protocol.game.outgoing.info.npcinfo.NpcAvatar avatar = npc.getRspAvatar();
+                        // Lazy alloc: static NPCs spawned during GameLoader.load() predate
+                        // the RSProt service, so they have no avatar yet.
+                        if (avatar == null) {
+                            final com.zenyte.game.util.Direction spawnDir = npc.getSpawnDirection();
+                            avatar = com.near_reality.network.rsprot.RspService.getService()
+                                    .getNpcAvatarFactory().alloc(
+                                            npc.getIndex(),
+                                            npc.getId(),
+                                            npc.getPlane(),
+                                            npc.getX(),
+                                            npc.getY(),
+                                            (int) WORLD_CYCLE,
+                                            spawnDir != null ? spawnDir.getNPCDirection() : 0
+                                    );
+                            npc.setRspAvatar(avatar);
+                        }
+                        com.near_reality.network.rsprot.NpcAvatarSync.sync(npc, avatar);
+                    } catch (final Throwable e) {
+                        log.error("Failed RSProt NPC sync for NPC(id={}, index={})",
+                                npc.getId(), npc.getIndex(), e);
+                    }
+                }
+            }
+
             // RSProt step 2: compute PlayerInfo / NpcInfo / WorldEntityInfo for all players at once.
             try {
                 com.near_reality.network.rsprot.RspService.updateInfoProtocols();
