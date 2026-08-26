@@ -28,6 +28,7 @@ import net.rsprot.protocol.game.outgoing.map.util.RebuildRegionZone
 import net.rsprot.protocol.game.outgoing.zone.header.UpdateZoneFullFollows
 import net.rsprot.protocol.game.outgoing.zone.header.UpdateZonePartialEnclosed
 import net.rsprot.protocol.message.OutgoingGameMessage
+import net.rsprot.protocol.game.outgoing.misc.client.ServerTickEnd
 import net.rsprot.protocol.message.ZoneProt
 import org.slf4j.LoggerFactory
 
@@ -111,6 +112,9 @@ class ZenyteRspClient(
 
     /** Queue an outgoing RSProt message. This is the path PacketDispatcher uses. */
     fun queue(message: OutgoingGameMessage) = rspSession.queue(message)
+
+    /** Marks the end of this tick for RSProx and the C++ client's ground-item timers. */
+    fun writeServerTickEnd() = rspSession.queue(ServerTickEnd)
 
     /**
      * Queue a zone payload for the chunk containing ([tileX], [tileY]).
