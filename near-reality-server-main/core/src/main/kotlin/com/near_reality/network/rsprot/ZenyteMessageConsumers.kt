@@ -8,6 +8,7 @@ import net.rsprot.protocol.game.incoming.buttons.If1Button
 import net.rsprot.protocol.game.incoming.buttons.If3Button
 import net.rsprot.protocol.game.incoming.buttons.IfButtonD
 import net.rsprot.protocol.game.incoming.buttons.IfButtonT
+import net.rsprot.protocol.game.incoming.buttons.IfSubOp
 import net.rsprot.protocol.game.incoming.locs.OpLoc6
 import net.rsprot.protocol.game.incoming.locs.OpLocT
 import net.rsprot.protocol.game.incoming.locs.OpLocV2
@@ -236,6 +237,18 @@ class ZenyteMessageConsumers {
                 -1,   // slot — If1Button doesn't carry sub/obj
                 -1,   // itemId
                 1,    // op (If1 is always option 1)
+            ).handle(player)
+        }
+
+        builder.addListener(IfSubOp::class.java) { player, msg ->
+            // Rev 239: right-click menu ops on if3 components arrive as IF_SUBOP
+            // (ops 2+ with sub/obj/op/subop). Route through the same If3ButtonEvent path.
+            If3ButtonEvent(
+                msg.interfaceId,
+                msg.componentId,
+                msg.sub,
+                msg.obj,
+                msg.op,
             ).handle(player)
         }
 
