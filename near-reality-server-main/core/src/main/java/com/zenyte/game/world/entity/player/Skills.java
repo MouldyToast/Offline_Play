@@ -579,9 +579,7 @@ public final class Skills extends SkillConstants implements TempPlayerStatePlugi
 
 	public void sendSkillMenu(final int skill, final int subCategory) {
 		player.getInterfaceHandler().sendInterface(InterfacePosition.CENTRAL, SkillConstants.SKILL_GUIDE_INTERFACE);
-		player.getVarManager().sendBit(4371, skill);
-		player.getVarManager().sendBit(4372, subCategory);
-		player.getPacketDispatcher().sendComponentSettings(SkillConstants.SKILL_GUIDE_INTERFACE, 8, 0, 75, AccessMask.CLICK_OP1);
+		player.getPacketDispatcher().sendClientScript(1902, skill, subCategory, 0, 0);
 		player.getTemporaryAttributes().put("viewingSkill", skill);
 	}
 
