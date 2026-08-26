@@ -1,7 +1,6 @@
 package com.zenyte.game.model.ui;
 
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
-import mgi.types.config.enums.EnumDefinitions;
 
 /**
  * @author Tommeh | 28 jan. 2018 : 23:38:10 | @author Kris | 22. sept 2018 : 20:34:02
@@ -84,9 +83,7 @@ public enum InterfacePosition {
 	 */
 	public static InterfacePosition getPosition(final int componentId, final PaneType pane) {
 		for (final InterfacePosition position : VALUES) {
-			final EnumDefinitions e = pane.getEnum();
-			final int bitpacked = e.getIntValue(161 << 16 | componentId);
-			if (componentId == (bitpacked & 65535)) {
+			if (position.getComponent(pane) == componentId) {
 				return position;
 			}
 		}
@@ -204,6 +201,98 @@ public enum InterfacePosition {
 	}
 
 	/**
+	 * Rev-239 mobile component mappings, replacing the stale NR cache enum 1745 lookup.
+	 * Key = resizable (161) component ID.
+	 * Value = mobile (601) component ID.
+	 * Source: MouldyToast/osrs-dumps rev-239 enum 1745 + component.sym
+	 */
+	private static final java.util.Map<Integer, Integer> REV239_MOBILE_MAP = new java.util.HashMap<>();
+	static {
+		REV239_MOBILE_MAP.put(  1,   4); // overlay_atmosphere
+		REV239_MOBILE_MAP.put(  2,   5); // hpbar_hud
+		REV239_MOBILE_MAP.put(  3,   6); // pvp_icons
+		REV239_MOBILE_MAP.put(  4,   9); // helper
+		REV239_MOBILE_MAP.put(  5,  13); // stat_boosts_hud
+		REV239_MOBILE_MAP.put(  6,  12); // buff_bar
+		REV239_MOBILE_MAP.put(  7,   8); // hud_container_back
+		REV239_MOBILE_MAP.put(  8,  14); // overlay_hud
+		REV239_MOBILE_MAP.put(  9,  15); // xp_drops
+		REV239_MOBILE_MAP.put( 10,  16); // zeah
+		REV239_MOBILE_MAP.put( 11,  10); // helper_dodger
+		REV239_MOBILE_MAP.put( 12,  11); // helper_content
+		REV239_MOBILE_MAP.put( 13,  17); // notifications
+		REV239_MOBILE_MAP.put( 14,  18); // mainmodal_backgrounds
+		REV239_MOBILE_MAP.put( 15,  26); // hud_container_front
+		REV239_MOBILE_MAP.put( 16,  27); // mainmodal
+		REV239_MOBILE_MAP.put( 17,  28); // maincrm
+		REV239_MOBILE_MAP.put( 18,  29); // floater
+		REV239_MOBILE_MAP.put( 19,  30); // debug
+		REV239_MOBILE_MAP.put( 20,  24); // multiway_icon
+		REV239_MOBILE_MAP.put( 21,  25); // gravestone
+		REV239_MOBILE_MAP.put( 30,  34); // minimap
+		REV239_MOBILE_MAP.put( 31,  35); // compassclick
+		REV239_MOBILE_MAP.put( 33,  37); // orbs
+		REV239_MOBILE_MAP.put( 34,  20); // gameframe
+		REV239_MOBILE_MAP.put( 35, 131); // popout
+		REV239_MOBILE_MAP.put( 36, 133); // tli_listener
+		REV239_MOBILE_MAP.put( 37, 132); // mouseover
+		REV239_MOBILE_MAP.put( 38, 113); // side_background
+		REV239_MOBILE_MAP.put( 42,  70); // side_bottom
+		REV239_MOBILE_MAP.put( 43,  74); // stone7
+		REV239_MOBILE_MAP.put( 44,  76); // stone8
+		REV239_MOBILE_MAP.put( 45,  75); // stone9
+		REV239_MOBILE_MAP.put( 46,  44); // stone10
+		REV239_MOBILE_MAP.put( 47,  77); // stone11
+		REV239_MOBILE_MAP.put( 48,  72); // stone12
+		REV239_MOBILE_MAP.put( 49,  73); // stone13
+		REV239_MOBILE_MAP.put( 50,  81); // icon7
+		REV239_MOBILE_MAP.put( 51,  83); // icon8
+		REV239_MOBILE_MAP.put( 52,  82); // icon9
+		REV239_MOBILE_MAP.put( 53,  45); // icon10
+		REV239_MOBILE_MAP.put( 54,  84); // icon11
+		REV239_MOBILE_MAP.put( 55,  79); // icon12
+		REV239_MOBILE_MAP.put( 56,  80); // icon13
+		REV239_MOBILE_MAP.put( 58,  96); // side_top
+		REV239_MOBILE_MAP.put( 59, 101); // stone0
+		REV239_MOBILE_MAP.put( 60,  71); // stone1
+		REV239_MOBILE_MAP.put( 61, 102); // stone2
+		REV239_MOBILE_MAP.put( 62,  97); // stone3
+		REV239_MOBILE_MAP.put( 63,  98); // stone4
+		REV239_MOBILE_MAP.put( 64,  99); // stone5
+		REV239_MOBILE_MAP.put( 65, 100); // stone6
+		REV239_MOBILE_MAP.put( 66, 108); // icon0
+		REV239_MOBILE_MAP.put( 67,  78); // icon1
+		REV239_MOBILE_MAP.put( 68, 109); // icon2
+		REV239_MOBILE_MAP.put( 69, 104); // icon3
+		REV239_MOBILE_MAP.put( 70, 105); // icon4
+		REV239_MOBILE_MAP.put( 71, 106); // icon5
+		REV239_MOBILE_MAP.put( 72, 107); // icon6
+		REV239_MOBILE_MAP.put( 74, 114); // sidemodal
+		REV239_MOBILE_MAP.put( 75, 115); // side_panels
+		REV239_MOBILE_MAP.put( 76, 116); // side0
+		REV239_MOBILE_MAP.put( 77, 117); // side1
+		REV239_MOBILE_MAP.put( 78, 118); // side2
+		REV239_MOBILE_MAP.put( 79, 119); // side3
+		REV239_MOBILE_MAP.put( 80, 120); // side4
+		REV239_MOBILE_MAP.put( 81, 121); // side5
+		REV239_MOBILE_MAP.put( 82, 122); // side6
+		REV239_MOBILE_MAP.put( 83, 123); // side7
+		REV239_MOBILE_MAP.put( 84, 124); // side8
+		REV239_MOBILE_MAP.put( 85, 125); // side9
+		REV239_MOBILE_MAP.put( 86, 126); // side10
+		REV239_MOBILE_MAP.put( 87, 127); // side11
+		REV239_MOBILE_MAP.put( 88, 128); // side12
+		REV239_MOBILE_MAP.put( 89, 129); // side13
+		REV239_MOBILE_MAP.put( 90, 130); // sidecrm
+		REV239_MOBILE_MAP.put( 92,   3); // viewport_tracker_back
+		REV239_MOBILE_MAP.put( 93,  21); // pm_container
+		REV239_MOBILE_MAP.put( 94,  23); // viewport_tracker_front
+		REV239_MOBILE_MAP.put( 95,  22); // map_container
+		REV239_MOBILE_MAP.put( 96,  49); // chat_container
+		REV239_MOBILE_MAP.put( 98, 134); // ui_highlights
+	}
+
+	/**
 	 * Gets the component id for the respective pane based on the resizable type.
 	 * Uses hardcoded rev-239 mappings instead of NR's stale cache enum lookup.
 	 *
@@ -256,9 +345,8 @@ public enum InterfacePosition {
 	 * @return the mobile component's id.
 	 */
 	public final int getMobileComponent() {
-		final EnumDefinitions e = PaneType.MOBILE.getEnum();
-		final int bitpacked = e.getIntValue(161 << 16 | resizableComponent);
-		return bitpacked == 0 ? resizableComponent : bitpacked & 65535;
+		final Integer mapped = REV239_MOBILE_MAP.get(resizableComponent);
+		return mapped != null ? mapped : resizableComponent;
 	}
 
 	/**
