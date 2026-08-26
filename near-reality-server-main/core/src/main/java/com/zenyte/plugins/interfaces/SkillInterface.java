@@ -1,6 +1,7 @@
 package com.zenyte.plugins.interfaces;
 
 import com.zenyte.game.content.skills.construction.constants.Furniture;
+import com.zenyte.game.model.ui.InterfacePosition;
 import com.zenyte.game.item.Item;
 import com.zenyte.game.model.ui.UserInterface;
 import com.zenyte.game.world.entity.player.Player;
@@ -15,6 +16,11 @@ public final class SkillInterface implements UserInterface {
 
 	@Override
 	public void handleComponentClick(final Player player, final int interfaceId, final int componentId, final int slotId, final int itemId, final int optionId, final String option) {
+		if (interfaceId == 860 && componentId == 4) {
+			player.getTemporaryAttributes().remove("viewingSkill");
+			player.getInterfaceHandler().closeInterface(InterfacePosition.CENTRAL);
+			return;
+		}
 		if (player.getTemporaryAttributes().get("viewingSkill") == null) {
 			return;
 		}
@@ -53,7 +59,7 @@ public final class SkillInterface implements UserInterface {
 
 	@Override
 	public int[] getInterfaceIds() {
-		return new int[] { 214 };
+		return new int[] { 214, 860 };
 	}
 
 }
