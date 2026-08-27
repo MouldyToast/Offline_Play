@@ -41,41 +41,42 @@ public class BankInterface extends Interface implements SwitchPlugin {
 
     @Override
     protected void attach() {
-        put(8, "Group storage");
-        put(17, "Swap mode");
-        put(19, "Insert mode");
-        put(22, "Withdraw as Item");
-        put(24, "Withdraw as Note");
-        put(28, "First option amount 1");
-        put(30, "First option amount 5");
-        put(32, "First option amount 10");
-        put(34, "First option amount X");
-        put(36, "First option amount All");
-        put(38, "Always set placeholders");
-        put(40, "Search");
-        put(42, "Deposit inventory");
-        put(44, "Deposit equipment");
-        put(11, "Interact with tab");
-        put(50, "Tab display");
-        put(52, "Show bank tutorial");
-        put(51, "Inventory item options");
-        put(54, "Deposit worn items button");
-        put(55, "Deposit inventory button");
-        put(56, "Release all placeholders");
-        put(58, "Set bank filler amount to 1");
-        put(60, "Set bank filler amount to 10");
-        put(62, "Set bank filler amount to 50");
-        put(64, "Set bank filler amount to X");
-        put(66, "Set bank filler amount to All");
-        put(68, "Add bank fillers");
-        put(53, "Toggle incinerator");
-        put(9, "Bank size");
-        put(7, "Bank size tooltip 1");
-        put(115, "Bank size tooltip 2");
-        put(13, "Interact with item");
-        put(47, "Incinerate item");
-        put(4, "Show tutorial");
-        put(124, "Preset Manager");
+        // rev239 component.sym: bankmain:*
+        put(125, "Group storage");              // gim_storage (was 8)
+        put(23, "Swap mode");                   // swap_insert (was 17)
+        put(23, "Insert mode");                 // swap_insert — same toggle (was 19)
+        put(25, "Withdraw as Item");            // note (was 22)
+        put(25, "Withdraw as Note");            // note — same toggle (was 24)
+        put(29, "First option amount 1");       // quantity1 (was 28)
+        put(31, "First option amount 5");       // quantity5 (was 30)
+        put(33, "First option amount 10");      // quantity10 (was 32)
+        put(35, "First option amount X");       // quantityx (was 34)
+        put(37, "First option amount All");     // quantityall (was 36)
+        put(40, "Always set placeholders");     // placeholder (was 38)
+        put(42, "Search");                      // search (was 40)
+        put(47, "Deposit inventory");           // depositinv (was 42)
+        put(49, "Deposit equipment");           // depositworn (was 44)
+        put(10, "Interact with tab");           // tabs (was 11)
+        put(127, "Tab display");                // tabdisplay (was 50)
+        put(131, "Show bank tutorial");         // banktut_toggle (was 52)
+        put(12, "Inventory item options");      // items (was 51)
+        put(134, "Deposit worn items button");  // depositworn_toggle (was 54 — NR misnamed)
+        put(134, "Deposit inventory button");   // depositinv_toggle (was 55)
+        put(140, "Release all placeholders");   // release_placeholders (was 56)
+        put(143, "Set bank filler amount to 1");  // bank_filler_1 (was 58)
+        put(145, "Set bank filler amount to 10"); // bank_filler_10 (was 60)
+        put(147, "Set bank filler amount to 50"); // bank_filler_50 (was 62)
+        put(149, "Set bank filler amount to X");  // bank_filler_x (was 64)
+        put(151, "Set bank filler amount to All"); // bank_filler_all (was 66)
+        put(153, "Add bank fillers");           // bank_filler_confirm (was 68)
+        put(130, "Toggle incinerator");         // incinerator_toggle (was 53)
+        put(5, "Bank size");                    // occupiedslots (was 9)
+        put(7, "Bank size tooltip 1");          // capacity_layer (was 7) — unchanged
+        put(8, "Bank size tooltip 2");          // capacity (was 115)
+        put(12, "Interact with item");          // items (was 13)
+        put(54, "Incinerate item");             // incinerator_target (was 47)
+        put(4, "Show tutorial");                // bank_tut (was 4) — unchanged
+        put(124, "Preset Manager");             // popup_button_in (was 124) — unchanged
         Enums.BANK_EQUIPMENT_TAB_SLOT_MAP.getValues().forEach((slot, component) -> put(component & 0xFFFF, "Unequip slot " + slot));
     }
 
