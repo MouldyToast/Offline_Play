@@ -75,7 +75,7 @@ public class SettingStructs {
     public static final int LOGOUT_TAB_KEYBIND_STRUCT_ID = 2752;
     public static final int NPC_ATTACK_OPTIONS_STRUCT_ID = 2738;
     public static final int EMOTES_TAB_KEYBIND_STRUCT_ID = 2744;
-    public static final int SHIFT_CLICK_TO_DROP_ITEMS_STRUCT_ID = 2772;
+    public static final int SHIFT_CLICK_TO_DROP_ITEMS_STRUCT_ID = 1104;
     public static final int CTRLCLICK_TO_INVERT_RUN_MODE_STRUCT_ID = 3762;
     public static final int DEADZONE_ADJUSTER_STRUCT_ID = 2774;
     public static final int INVENTORY_TAB_KEYBIND_STRUCT_ID = 2748;
