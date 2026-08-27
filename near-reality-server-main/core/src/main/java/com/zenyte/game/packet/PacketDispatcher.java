@@ -413,7 +413,8 @@ public class PacketDispatcher {
 	// ------------------------------------------------------------------
 
 	public void sendRunEnergy() {
-		queue(new UpdateRunEnergy((int) player.getVariables().getRunEnergy()));
+		// RSProt expects 0-10000 (hundredths of a percent), NR stores 0.0-100.0
+		queue(new UpdateRunEnergy((int) (player.getVariables().getRunEnergy() * 100)));
 	}
 
 	public void sendWeight() {
