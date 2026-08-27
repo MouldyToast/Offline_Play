@@ -88,7 +88,7 @@ public class SettingVariables {
     public static final int SHOW_THE_STORE_BUTTON_ON_DESKTOP_VARBIT_ID = 13037;
     public static final int MIDDLE_MOUSE_BUTTON_CONTROLS_THE_CAMERA_VARBIT_ID = 4134;
     public static final int MOVE_FOLLOWER_OPTIONS_LOWER_DOWN_VARBIT_ID = 5599;
-    public static final int SHIFT_CLICK_TO_DROP_ITEMS_VARBIT_ID = 5542;
+    public static final int SHIFT_CLICK_TO_DROP_ITEMS_VARBIT_ID = 11556;
     public static final int SHOW_THE_FUNCTION_BUTTON_VARBIT_ID = 6257;
     public static final int MODERN_LAYOUT_SIDE_PANEL_CAN_BE_CLOSED_BY_THE_HOTKEYS_VARBIT_ID = 4611;
     public static final int ESC_CLOSES_THE_CURRENT_INTERFACE_VARBIT_ID = 4681;
@@ -117,7 +117,7 @@ public class SettingVariables {
     public static final int CHAMBERS_OF_XERIC_HELPER_VARBIT_ID = 12347;
     public static final int AGILITY_HELPER_VARBIT_ID = 12379;
     public static final int HIGHLIGHT_AGILITY_OBSTACLES_VARBIT_ID = 12380;
-    public static final int HIGHLIGHT_AGILITY_SHORTCUTS_VARBIT_ID = 12976;
+    public static final int HIGHLIGHT_AGILITY_SHORTCUTS_VARBIT_ID = 13135;
     public static final int FISHING_SPOT_INDICATORS_VARBIT_ID = 12349;
     public static final int FISHING_SPOT_INDICATORS_TOOLS_ONLY_VARBIT_ID = 12350;
     public static final int FISHING_SPOT_INDICATORS_MOUSE_OVER_TOOLTIP_VARBIT_ID = 12351;
