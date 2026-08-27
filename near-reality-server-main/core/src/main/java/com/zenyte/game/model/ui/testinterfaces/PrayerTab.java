@@ -17,8 +17,9 @@ public class PrayerTab extends Interface {
     @Override
     protected DefaultClickHandler getDefaultHandler() {
         return (player, componentId, slotId, itemId, optionId) -> {
-            if (componentId >= 5 && componentId <= 33) {
-                player.getPrayerManager().togglePrayer(componentId - 5, false);
+            // rev239: prayer1=9 through prayer30=38  (was 5–33)
+            if (componentId >= 9 && componentId <= 38) {
+                player.getPrayerManager().togglePrayer(componentId - 9, false);
             }
         };
     }
