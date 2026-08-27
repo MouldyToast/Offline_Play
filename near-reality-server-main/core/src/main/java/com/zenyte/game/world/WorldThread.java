@@ -507,7 +507,7 @@ public final class WorldThread extends MainThread {
                                     player.setLogoutType(LogoutType.NONE);
                                 }
                             }
-                            player.getSession().flush();
+                            //player.getSession().flush(); Might be bad 
                         }
                     }
                 } catch (final Throwable e) {
