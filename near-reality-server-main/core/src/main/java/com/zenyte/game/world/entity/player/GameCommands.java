@@ -1911,12 +1911,26 @@ public final class GameCommands {
         //new Command(Privilege.ADMINISTRATOR, "rinfo", (p, args) -> RaidFloorOverviewD.open(p));
         new Command(PlayerPrivilege.DEVELOPER, "maxbank", "Sets your bank to a preset.",
                 (p, args) -> BankPreset.setBank(p));
-        new Command(PlayerPrivilege.FORUM_MODERATOR, "god", "Sets all your bonuses to 15000.", (p, arags) -> {
+        new Command(PlayerPrivilege.FORUM_MODERATOR, "god", "Toggles god mode: immune, max bonuses, full replenish.", (p, arags) -> {
             if(!isLiveEligible(p, PlayerPrivilege.DEVELOPER, PlayerPrivilege.FORUM_MODERATOR))
                 return;
-            p.sendMessage("Your bonuses have been set to 15000.");
-            for (int i = 0; i < 12; i++) {
-                p.getBonuses().setBonus(i, 15000);
+            final boolean enabling = p.getTemporaryAttributes().get("godMode") == null;
+            if (enabling) {
+                p.getTemporaryAttributes().put("godMode", Boolean.TRUE);
+                p.immune = true;
+                for (int i = 0; i < 12; i++) {
+                    p.getBonuses().setBonus(i, 30000);
+                }
+                p.setHitpoints(p.getSkills().getLevelForXp(SkillConstants.HITPOINTS));
+                p.getPrayerManager().setPrayerPoints(p.getSkills().getLevelForXp(SkillConstants.PRAYER));
+                p.getCombatDefinitions().setSpecialEnergy(100);
+                p.getVariables().forceRunEnergy(100);
+                p.sendMessage("God mode enabled.");
+            } else {
+                p.getTemporaryAttributes().remove("godMode");
+                p.immune = false;
+                p.getBonuses().update();
+                p.sendMessage("God mode disabled.");
             }
         });
         new Command(PlayerPrivilege.DEVELOPER, "ca", "Complete all combat achievements", (p, arags) -> {
