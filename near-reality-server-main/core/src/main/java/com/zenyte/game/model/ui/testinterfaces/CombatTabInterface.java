@@ -13,14 +13,16 @@ import com.zenyte.game.world.entity.player.Player;
 public class CombatTabInterface extends Interface {
     @Override
     protected void attach() {
-        put(4, "Attack style 1");
-        put(8, "Attack style 2");
-        put(12, "Attack style 3");
-        put(16, "Attack style 4");
-        put(21, "Defensive autocast");
-        put(26, "Autocast");
-        put(30, "Auto retaliate");
-        put(36, "Special attack");
+        // rev239 component.sym: combat_interface:0 through :3, autocast_defensive,
+        // autocast_normal, retaliate, special_attack
+        put(6, "Attack style 1");       // was 4
+        put(10, "Attack style 2");      // was 8
+        put(14, "Attack style 3");      // was 12
+        put(18, "Attack style 4");      // was 16
+        put(23, "Defensive autocast");  // was 21
+        put(28, "Autocast");            // was 26
+        put(32, "Auto retaliate");      // was 30
+        put(39, "Special attack");      // was 36
     }
 
     @Override
